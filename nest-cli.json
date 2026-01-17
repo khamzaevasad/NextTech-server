@@ -1,8 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "src",
+  "sourceRoot": "apps/next-tech-api/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/next-tech-api/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/next-tech-api",
+  "projects": {
+    "next-tech-api": {
+      "type": "application",
+      "root": "apps/next-tech-api",
+      "entryFile": "main",
+      "sourceRoot": "apps/next-tech-api/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/next-tech-api/tsconfig.app.json"
+      }
+    },
+    "next-tech-batch": {
+      "type": "application",
+      "root": "apps/next-tech-batch",
+      "entryFile": "main",
+      "sourceRoot": "apps/next-tech-batch/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/next-tech-batch/tsconfig.app.json"
+      }
+    }
   }
 }
