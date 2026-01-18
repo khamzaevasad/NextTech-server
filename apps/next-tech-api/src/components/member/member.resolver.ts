@@ -18,7 +18,6 @@ export class MemberResolver {
   //   login
   public async login(@Args('input') input: LoginInput): Promise<Member> {
     console.log('Mutation: login');
-    console.log(input);
     return await this.memberService.login(input);
   }
 }
