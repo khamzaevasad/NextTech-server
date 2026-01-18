@@ -11,15 +11,14 @@ export class MemberResolver {
   //   signup
   public async signup(@Args('input') input: MemberInput): Promise<Member> {
     console.log('Mutation: Signup');
-    console.log(input);
     return await this.memberService.signup(input);
   }
 
-  @Mutation(() => String)
+  @Mutation(() => Member)
   //   login
-  public async login(@Args('input') input: LoginInput): Promise<String> {
+  public async login(@Args('input') input: LoginInput): Promise<Member> {
     console.log('Mutation: login');
     console.log(input);
-    return await this.memberService.login();
+    return await this.memberService.login(input);
   }
 }
