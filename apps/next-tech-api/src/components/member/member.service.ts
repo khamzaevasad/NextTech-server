@@ -8,12 +8,14 @@ import { Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { T } from '../../libs/types/common';
+import { ViewService } from '../view/view.service';
 
 @Injectable()
 export class MemberService {
   constructor(
     @InjectModel('Member') private readonly memberModel: Model<Member>,
     private readonly authService: AuthService,
+    private readonly viewService: ViewService,
   ) {}
 
   // signup
@@ -68,7 +70,7 @@ export class MemberService {
   }
 
   // getMember
-  public async getMember(targetId: ObjectId | null): Promise<Member> {
+  public async getMember(memberId: ObjectId | null, targetId: ObjectId | null): Promise<Member> {
     const search: T = {
       _id: targetId,
       memberStatus: {
@@ -78,6 +80,10 @@ export class MemberService {
 
     const targetMember = await this.memberModel.findOne(search).exec();
     if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    if (memberId) {
+      await this.viewService.recordView();
+    }
 
     return targetMember;
   }

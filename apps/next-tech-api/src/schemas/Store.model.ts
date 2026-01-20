@@ -18,6 +18,10 @@ const StoreSchema = new Schema({
     type: String,
     default: '',
   },
+  storePhone: {
+    type: String,
+    required: true,
+  },
 
   storeStatus: {
     type: String,
