@@ -20,4 +20,4 @@ export enum StoreLocation {
   JEJU = 'JEJU',
 }
 
-registerEnumType(StoreStatus, { name: 'StoreStatus' });
+registerEnumType(StoreLocation, { name: 'StoreLocation' });

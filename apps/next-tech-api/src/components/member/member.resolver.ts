@@ -62,15 +62,6 @@ export class MemberResolver {
     return await this.memberService.getMember(memberId, targetId);
   }
 
-  /**STORE**/
-  @Roles(MemberType.ADMIN)
-  @UseGuards(RolesGuard)
-  @Mutation(() => String)
-  //   createStore
-  public async createStore(): Promise<String> {
-    console.log('Mutation: createStore');
-    return 'HI';
-  }
   /**ADMIN**/
 
   @Roles(MemberType.ADMIN)
