@@ -8,6 +8,8 @@ import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
+import type { ObjectId } from 'mongoose';
 
 @Resolver()
 export class MemberResolver {
@@ -28,11 +30,22 @@ export class MemberResolver {
   }
 
   @UseGuards(AuthGuard)
-  @Mutation(() => String)
+  @Query(() => String)
+  // checkAuth
+  public async checkAuth(@AuthMember() memberData: Member): Promise<String> {
+    return `hi ${memberData.memberNick} your id ${memberData._id}`;
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => Member)
   // updateMember
-  public async updateMember(@AuthMember('_id') memberId: string): Promise<String> {
+  public async updateMember(
+    @Args('input') input: MemberUpdate,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Member> {
     console.log('Mutation: updateMember');
-    return await this.memberService.updateMember();
+    delete input._id;
+    return await this.memberService.updateMember(memberId, input);
   }
 
   @Query(() => String)
@@ -40,13 +53,6 @@ export class MemberResolver {
   public async getMember(): Promise<String> {
     console.log('Query: getMember');
     return await this.memberService.getMember();
-  }
-
-  @UseGuards(AuthGuard)
-  @Query(() => String)
-  // checkAuth
-  public async checkAuth(@AuthMember() memberData: Member): Promise<String> {
-    return `hi ${memberData.memberNick} your id ${memberData._id}`;
   }
 
   /**ADMIN**/
@@ -58,7 +64,7 @@ export class MemberResolver {
   public async getAllMembersByAdmin(@AuthMember('memberType') memberType: string): Promise<String> {
     console.log('Mutation: getAllMembersByAdmin');
     console.log('memberType', memberType);
-    return await this.memberService.updateMember();
+    return await this.memberService.getAllMembersByAdmin();
   }
 
   @Roles(MemberType.ADMIN)
@@ -67,6 +73,6 @@ export class MemberResolver {
   // updateMemberByAdmin
   public async updateMemberByAdmin(): Promise<String> {
     console.log('Mutation: updateMemberByAdmin');
-    return await this.memberService.updateMember();
+    return await this.memberService.updateMemberByAdmin();
   }
 }

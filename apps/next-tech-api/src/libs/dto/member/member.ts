@@ -25,7 +25,7 @@ export class Member {
   memberPassword?: string;
 
   @Field(() => String, { nullable: true })
-  memberFullname?: string;
+  memberFullName?: string;
 
   @Field(() => String)
   memberImage: string;
