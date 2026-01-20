@@ -63,10 +63,13 @@ export class MemberService {
   }
 
   /**ADMIN**/
+
+  // getAllMembersByAdmin
   public async getAllMembersByAdmin(): Promise<String> {
     return 'getAllMembersByAdmin executed';
   }
 
+  // updateMemberByAdmin
   public async updateMemberByAdmin(): Promise<String> {
     return 'updateMemberByAdmin executed';
   }

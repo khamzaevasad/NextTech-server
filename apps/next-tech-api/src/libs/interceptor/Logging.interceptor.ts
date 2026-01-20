@@ -33,8 +33,8 @@ export class LoggingInterceptor implements NestInterceptor {
         const time = Date.now() - startedAt;
 
         this.logger.log(
-          `✅ ${operation} completed in ${time}ms\n` +
-            `📤 Response: ${this.safeStringify(response)}\n`,
+          `✅ ${operation} completed in ${time}ms\n \n` +
+            `📤 Response: ${this.safeStringify(response)}\n \n`,
         );
       }),
       catchError((err) => {
