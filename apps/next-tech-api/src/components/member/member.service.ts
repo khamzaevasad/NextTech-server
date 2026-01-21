@@ -81,10 +81,6 @@ export class MemberService {
     const targetMember = await this.memberModel.findOne(search).exec();
     if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
-    if (memberId) {
-      await this.viewService.recordView();
-    }
-
     return targetMember;
   }
 
