@@ -1,3 +1,4 @@
+import { Member, TotalCounter } from './../member/member';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { StoreLocation, StoreStatus } from '../../enums/store.enum';
 
@@ -32,4 +33,18 @@ export class Store {
 
   @Field(() => Int)
   storeLikes: number;
+
+  /**From Aggregation**/
+
+  @Field(() => Member, { nullable: true })
+  ownerData?: Member;
+}
+
+@ObjectType()
+export class Stores {
+  @Field(() => [Store])
+  list: Store[];
+
+  @Field(() => [TotalCounter], { nullable: true })
+  metaCounter?: TotalCounter[];
 }

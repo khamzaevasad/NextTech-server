@@ -1,15 +1,17 @@
+import { Stores } from './../../libs/dto/store/store';
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Store } from '../../libs/dto/store/store';
-import { StoreInput } from '../../libs/dto/store/store.input';
-import { Message } from '../../libs/enums/common.enum';
+import { StoreInput, StoresInquiry } from '../../libs/dto/store/store.input';
+import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
 import { MemberStatus } from '../../libs/enums/member.enum';
 import { StoreStatus } from '../../libs/enums/store.enum';
 import { ViewService } from '../view/view.service';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
+import { lookupMember } from '../../libs/config';
 
 @Injectable()
 export class StoreService {
@@ -58,5 +60,34 @@ export class StoreService {
     }
 
     return targetStore;
+  }
+
+  // getStores
+  public async getStores(memberId: ObjectId, input: StoresInquiry): Promise<Stores> {
+    const { text } = input.search;
+    const match: T = { storeStatus: StoreStatus.ACTIVE };
+    const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+    if (text) match.storeName = { $regex: new RegExp(text, 'i') };
+
+    const result = await this.storeModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupMember,
+              { $unwind: '$ownerData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result[0];
   }
 }
