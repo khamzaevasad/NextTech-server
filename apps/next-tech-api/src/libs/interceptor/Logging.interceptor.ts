@@ -25,7 +25,9 @@ export class LoggingInterceptor implements NestInterceptor {
 
     /** REQUEST LOG */
     this.logger.log(
-      `➡️  ${operation}\n` + `📥 Query: ${query}\n` + `📦 Variables: ${JSON.stringify(variables)}`,
+      `➡️  ${operation}\n \n` +
+        `📥 Query: ${query}\n \n` +
+        `📦 Variables: ${JSON.stringify(variables)} \n \n`,
     );
 
     return next.handle().pipe(
@@ -41,7 +43,7 @@ export class LoggingInterceptor implements NestInterceptor {
         const time = Date.now() - startedAt;
 
         this.logger.error(
-          `❌ ${operation} failed in ${time}ms\n` + `💥 Error: ${err.message}`,
+          `❌ ${operation} failed in ${time}ms\n \n` + `💥 Error: ${err.message}`,
           err.stack,
         );
 

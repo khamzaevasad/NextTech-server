@@ -24,7 +24,6 @@ export class StoreResolver {
     @Args('input') input: StoreInput,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Store> {
-    console.log('Mutation: createStore');
     return await this.storeService.createStore(memberId, input);
   }
 
@@ -34,8 +33,6 @@ export class StoreResolver {
     @Args('storeId') input: string,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Store> {
-    console.log('Query: getStores');
-
     const storeId = shapeIntoMongoObjectId(input);
     return await this.storeService.getStore(memberId, storeId);
   }

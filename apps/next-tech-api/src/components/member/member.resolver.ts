@@ -1,7 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { MemberService } from './member.service';
-import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
-import { Member } from '../../libs/dto/member/member';
+import { LoginInput, MemberInput, SellersInquiry } from '../../libs/dto/member/member.input';
+import { Member, Members } from '../../libs/dto/member/member';
 import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
@@ -45,7 +45,6 @@ export class MemberResolver {
     @Args('input') input: MemberUpdate,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Member> {
-    console.log('Mutation: updateMember');
     delete input._id;
     return await this.memberService.updateMember(memberId, input);
   }
@@ -57,20 +56,26 @@ export class MemberResolver {
     @Args('memberId') input: string,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Member> {
-    console.log('Query: getMember');
     const targetId = shapeIntoMongoObjectId(input);
     return await this.memberService.getMember(memberId, targetId);
   }
 
-  /**ADMIN**/
+  @UseGuards(WithoutGuard)
+  @Query(() => Members)
+  // getSeller
+  public async getSeller(
+    @Args('memberId') input: SellersInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Members> {
+    return this.memberService.getSeller(memberId, input);
+  }
 
+  /**ADMIN**/
   @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
   @Mutation(() => String)
   // getAllMembersByAdmin
   public async getAllMembersByAdmin(@AuthMember('memberType') memberType: string): Promise<String> {
-    console.log('Mutation: getAllMembersByAdmin');
-    console.log('memberType', memberType);
     return await this.memberService.getAllMembersByAdmin();
   }
 
@@ -79,7 +84,6 @@ export class MemberResolver {
   @Mutation(() => String)
   // updateMemberByAdmin
   public async updateMemberByAdmin(): Promise<String> {
-    console.log('Mutation: updateMemberByAdmin');
     return await this.memberService.updateMemberByAdmin();
   }
 }
