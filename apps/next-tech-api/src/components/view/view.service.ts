@@ -9,6 +9,7 @@ import { T } from '../../libs/types/common';
 export class ViewService {
   constructor(@InjectModel('View') private readonly viewModel: Model<View>) {}
 
+  /* ------------------------------- recordView ------------------------------- */
   public async recordView(input: ViewInput): Promise<View | null> {
     const viewExist = await this.checkViewExistence(input);
     if (!viewExist) {
@@ -18,7 +19,7 @@ export class ViewService {
       return null;
     }
   }
-
+  /* --------------------------- checkViewExistence --------------------------- */
   private async checkViewExistence(input: ViewInput): Promise<View | null> {
     const { memberId, viewRefId } = input;
     const search: T = { memberId: memberId, viewRefId: viewRefId };

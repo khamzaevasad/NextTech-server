@@ -18,7 +18,7 @@ export class MemberService {
     private readonly viewService: ViewService,
   ) {}
 
-  // signup
+  /* --------------------------------  signup ------------------------------- */
   public async signup(input: MemberInput): Promise<Member> {
     input.memberPassword = await this.authService.hashPassword(input.memberPassword);
     try {
@@ -31,7 +31,7 @@ export class MemberService {
     }
   }
 
-  // login
+  /* --------------------------------  login -------------------------------- */
   public async login(input: LoginInput): Promise<Member> {
     const { memberNick, memberPassword } = input;
     const response: Member | null = await this.memberModel
@@ -56,7 +56,7 @@ export class MemberService {
     return response;
   }
 
-  // updateMember
+  /* -----------------------------  updateMember ---------------------------- */
   public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<Member> {
     const result: Member | null = await this.memberModel
       .findOneAndUpdate({ _id: memberId, memberStatus: MemberStatus.ACTIVE }, input, { new: true })
@@ -69,7 +69,7 @@ export class MemberService {
     return result;
   }
 
-  // getMember
+  /* ------------------------------  getMember ------------------------------ */
   public async getMember(memberId: ObjectId | null, targetId: ObjectId | null): Promise<Member> {
     const search: T = {
       _id: targetId,
@@ -84,7 +84,7 @@ export class MemberService {
     return targetMember;
   }
 
-  // getSeller
+  /* ------------------------------  getSeller ------------------------------ */
   public async getSeller(memberId: ObjectId, input: SellersInquiry): Promise<Members> {
     const { text } = input.search;
     const match: T = { memberType: MemberType.SELLER, memberStatus: MemberStatus.ACTIVE };
@@ -109,14 +109,16 @@ export class MemberService {
     return result[0];
   }
 
-  /**ADMIN**/
+  /* -------------------------------------------------------------------------- */
+  /*                                    ADMIN                                   */
+  /* -------------------------------------------------------------------------- */
 
-  // getAllMembersByAdmin
+  /* -------------------------  getAllMembersByAdmin ------------------------ */
   public async getAllMembersByAdmin(): Promise<String> {
     return 'getAllMembersByAdmin executed';
   }
 
-  // updateMemberByAdmin
+  /* -------------------------  updateMemberByAdmin ------------------------- */
   public async updateMemberByAdmin(): Promise<String> {
     return 'updateMemberByAdmin executed';
   }

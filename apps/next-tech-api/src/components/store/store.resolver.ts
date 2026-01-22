@@ -19,7 +19,7 @@ export class StoreResolver {
   @Roles(MemberType.SELLER)
   @UseGuards(RolesGuard)
   @Mutation(() => Store)
-  //   createStore
+  /* ------------------------------- createStore ------------------------------ */
   public async createStore(
     @Args('input') input: StoreInput,
     @AuthMember('_id') memberId: ObjectId,
@@ -29,7 +29,7 @@ export class StoreResolver {
 
   @UseGuards(WithoutGuard)
   @Query(() => Store)
-  // getStore
+  /* -------------------------------- getStore -------------------------------- */
   public async getStore(
     @Args('storeId') input: string,
     @AuthMember('_id') memberId: ObjectId,
@@ -40,7 +40,7 @@ export class StoreResolver {
 
   @UseGuards(WithoutGuard)
   @Query(() => Stores)
-  // getStores
+  /* -------------------------------- getStores ------------------------------- */
   public async getStores(
     @Args('memberId') input: StoresInquiry,
     @AuthMember('_id') memberId: ObjectId,

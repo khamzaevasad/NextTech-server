@@ -20,7 +20,7 @@ export class StoreService {
     private readonly viewService: ViewService,
   ) {}
 
-  // createStore
+  /* ------------------------------- createStore ------------------------------ */
   public async createStore(ownerId: ObjectId, input: StoreInput): Promise<Store> {
     try {
       input.ownerId = ownerId;
@@ -32,7 +32,7 @@ export class StoreService {
     }
   }
 
-  //  getStore
+  /* -------------------------------- getStore -------------------------------- */
   public async getStore(memberId: ObjectId, storeId: ObjectId): Promise<Store> {
     const search: T = {
       _id: storeId,
@@ -62,7 +62,7 @@ export class StoreService {
     return targetStore;
   }
 
-  // getStores
+  /* -------------------------------- getStores -------------------------------- */
   public async getStores(memberId: ObjectId, input: StoresInquiry): Promise<Stores> {
     const { text } = input.search;
     const match: T = { storeStatus: StoreStatus.ACTIVE };

@@ -12,20 +12,21 @@ import { MemberUpdate } from '../../libs/dto/member/member.update';
 import type { ObjectId } from 'mongoose';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
+import { text } from 'stream/consumers';
 
 @Resolver()
 export class MemberResolver {
   constructor(private readonly memberService: MemberService) {}
 
   @Mutation(() => Member)
-  //   signup
+  /* -------------------------------  signup ------------------------------ */
   public async signup(@Args('input') input: MemberInput): Promise<Member> {
     console.log('Mutation: Signup');
     return await this.memberService.signup(input);
   }
 
   @Mutation(() => Member)
-  //   login
+  /* ------------------------------- login ------------------------------- */
   public async login(@Args('input') input: LoginInput): Promise<Member> {
     console.log('Mutation: login');
     return await this.memberService.login(input);
@@ -33,14 +34,14 @@ export class MemberResolver {
 
   @UseGuards(AuthGuard)
   @Query(() => String)
-  // checkAuth
+  /* ------------------------------  checkAuth ------------------------------ */
   public async checkAuth(@AuthMember() memberData: Member): Promise<String> {
     return `hi ${memberData.memberNick} your id ${memberData._id}`;
   }
 
   @UseGuards(AuthGuard)
   @Mutation(() => Member)
-  // updateMember
+  /* -----------------------------  updateMember ---------------------------- */
   public async updateMember(
     @Args('input') input: MemberUpdate,
     @AuthMember('_id') memberId: ObjectId,
@@ -51,7 +52,7 @@ export class MemberResolver {
 
   @UseGuards(WithoutGuard)
   @Query(() => Member)
-  // getMember
+  /* ------------------------------  getMember ------------------------------ */
   public async getMember(
     @Args('memberId') input: string,
     @AuthMember('_id') memberId: ObjectId,
@@ -62,7 +63,7 @@ export class MemberResolver {
 
   @UseGuards(WithoutGuard)
   @Query(() => Members)
-  // getSeller
+  /* ------------------------------  getSeller ------------------------------ */
   public async getSeller(
     @Args('memberId') input: SellersInquiry,
     @AuthMember('_id') memberId: ObjectId,
@@ -70,11 +71,13 @@ export class MemberResolver {
     return this.memberService.getSeller(memberId, input);
   }
 
-  /**ADMIN**/
+  /* -------------------------------------------------------------------------- */
+  /*                                    ADMIN                                   */
+  /* -------------------------------------------------------------------------- */
   @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
   @Mutation(() => String)
-  // getAllMembersByAdmin
+  /* ------------------------- // getAllMembersByAdmin ------------------------ */
   public async getAllMembersByAdmin(@AuthMember('memberType') memberType: string): Promise<String> {
     return await this.memberService.getAllMembersByAdmin();
   }
@@ -82,7 +85,7 @@ export class MemberResolver {
   @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
   @Mutation(() => String)
-  // updateMemberByAdmin
+  /* ------------------------- // updateMemberByAdmin ------------------------- */
   public async updateMemberByAdmin(): Promise<String> {
     return await this.memberService.updateMemberByAdmin();
   }
