@@ -9,6 +9,7 @@ import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { T } from '../../libs/types/common';
 import { ViewService } from '../view/view.service';
+import { lookupStore } from '../../libs/config';
 
 @Injectable()
 export class MemberService {
@@ -97,7 +98,12 @@ export class MemberService {
         { $sort: sort },
         {
           $facet: {
-            list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupStore,
+              { $unwind: '$storeData' },
+            ],
             metaCounter: [{ $count: 'total' }],
           },
         },

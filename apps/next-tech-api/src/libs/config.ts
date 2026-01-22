@@ -23,3 +23,13 @@ export const lookupMember = {
     as: 'ownerData',
   },
 };
+
+// lookupStore
+export const lookupStore = {
+  $lookup: {
+    from: 'stores',
+    localField: '_id',
+    foreignField: 'ownerId',
+    as: 'storeData',
+  },
+};
