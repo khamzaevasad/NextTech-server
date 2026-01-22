@@ -12,7 +12,7 @@ import { ViewService } from '../view/view.service';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { lookupMember } from '../../libs/config';
-import { StoreUpdate } from '../../libs/dto/store/store.update';
+import { StoreUpdate, StoreUpdateAdmin } from '../../libs/dto/store/store.update';
 
 @Injectable()
 export class StoreService {
@@ -102,5 +102,21 @@ export class StoreService {
 
     if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     return result[0];
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  FOR ADMIN                                 */
+  /* -------------------------------------------------------------------------- */
+
+  /* --------------------------- updateStoreByAdmin --------------------------- */
+  public async updateStoreByAdmin(input: StoreUpdateAdmin): Promise<Store> {
+    const result: Store | null = await this.storeModel
+      .findOneAndUpdate({ _id: input._id }, input, {
+        new: true,
+      })
+      .exec();
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+    return result;
   }
 }
