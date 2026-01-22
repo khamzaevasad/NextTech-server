@@ -10,6 +10,7 @@ import type { ObjectId } from 'mongoose';
 import { StoreInput, StoresInquiry } from '../../libs/dto/store/store.input';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
+import { StoreUpdate } from '../../libs/dto/store/store.update';
 
 @Resolver()
 export class StoreResolver {
@@ -25,6 +26,18 @@ export class StoreResolver {
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Store> {
     return await this.storeService.createStore(memberId, input);
+  }
+
+  @Roles(MemberType.SELLER)
+  @UseGuards(RolesGuard)
+  @Mutation(() => Store)
+  /* ------------------------------- updateStore ------------------------------ */
+  public async updateStore(
+    @Args('input') input: StoreUpdate,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Store> {
+    delete input._id;
+    return await this.storeService.updateStore(memberId, input);
   }
 
   @UseGuards(WithoutGuard)

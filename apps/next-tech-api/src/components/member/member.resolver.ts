@@ -17,7 +17,6 @@ import { MemberUpdate } from '../../libs/dto/member/member.update';
 import type { ObjectId } from 'mongoose';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
-import { text } from 'stream/consumers';
 
 @Resolver()
 export class MemberResolver {

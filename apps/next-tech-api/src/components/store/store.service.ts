@@ -12,6 +12,7 @@ import { ViewService } from '../view/view.service';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { lookupMember } from '../../libs/config';
+import { StoreUpdate } from '../../libs/dto/store/store.update';
 
 @Injectable()
 export class StoreService {
@@ -30,6 +31,18 @@ export class StoreService {
       console.log('Error: createStore', err.message);
       throw new InternalServerErrorException(Message.CREATE_FAILED);
     }
+  }
+
+  /* ------------------------------- updateStore ------------------------------ */
+  public async updateStore(memberId: ObjectId, input: StoreUpdate): Promise<Store> {
+    const result: Store | null = await this.storeModel
+      .findOneAndUpdate({ ownerId: memberId, storeStatus: StoreStatus.ACTIVE }, input, {
+        new: true,
+      })
+      .exec();
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+    return result;
   }
 
   /* -------------------------------- getStore -------------------------------- */
