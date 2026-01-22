@@ -2,7 +2,12 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Member, Members } from '../../libs/dto/member/member';
-import { LoginInput, MemberInput, SellersInquiry } from '../../libs/dto/member/member.input';
+import {
+  LoginInput,
+  MemberInput,
+  MembersInquiry,
+  SellersInquiry,
+} from '../../libs/dto/member/member.input';
 import { MemberStatus, MemberType } from '../../libs/enums/member.enum';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { AuthService } from '../auth/auth.service';
@@ -120,12 +125,40 @@ export class MemberService {
   /* -------------------------------------------------------------------------- */
 
   /* -------------------------  getAllMembersByAdmin ------------------------ */
-  public async getAllMembersByAdmin(): Promise<String> {
-    return 'getAllMembersByAdmin executed';
+  public async getAllMembersByAdmin(input: MembersInquiry): Promise<Members> {
+    const { text, memberStatus, memberType } = input.search;
+    const match: T = {};
+    const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+    if (memberStatus) match.memberStatus = memberStatus;
+    if (memberType) match.memberType = memberType;
+    if (text) match.memberNick = { $regex: new RegExp(text, 'i') };
+
+    const result = await this.memberModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [{ $skip: (input.page - 1) * input.limit }, { $limit: input.limit }],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    return result[0];
   }
 
   /* -------------------------  updateMemberByAdmin ------------------------- */
-  public async updateMemberByAdmin(): Promise<String> {
-    return 'updateMemberByAdmin executed';
+  public async updateMemberByAdmin(input: MemberUpdate): Promise<Member> {
+    const result = await this.memberModel
+      .findOneAndUpdate({ _id: input._id }, input, {
+        new: true,
+      })
+      .exec();
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+    return result;
   }
 }

@@ -10,6 +10,7 @@ export const availableStoreSorts = [
   'storeViews',
 ];
 
+export const availableMemberSorts = ['createdAt', 'updatedAt'];
 export const shapeIntoMongoObjectId = (target: any) => {
   return typeof target === 'string' ? new ObjectId(target) : target;
 };
