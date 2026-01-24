@@ -33,6 +33,11 @@ const ProductSchema = new Schema(
       ref: 'Category',
       required: true,
     },
+    storeId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Store',
+      required: true,
+    },
     productBrand: {
       type: String,
       required: true,

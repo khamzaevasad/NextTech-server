@@ -6,7 +6,6 @@ import { Store } from '../../libs/dto/store/store';
 import { StoreInput, StoresInquiry } from '../../libs/dto/store/store.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
-import { MemberStatus } from '../../libs/enums/member.enum';
 import { StoreStatus } from '../../libs/enums/store.enum';
 import { ViewService } from '../view/view.service';
 import { ViewInput } from '../../libs/dto/view/view.input';

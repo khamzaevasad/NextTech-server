@@ -7,7 +7,7 @@ import {
   SellersInquiry,
 } from '../../libs/dto/member/member.input';
 import { Member, Members } from '../../libs/dto/member/member';
-import { InternalServerErrorException, UseGuards } from '@nestjs/common';
+import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
