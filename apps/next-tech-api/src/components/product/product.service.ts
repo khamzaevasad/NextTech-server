@@ -47,6 +47,12 @@ export class ProductService {
       };
 
       const result = await this.productModel.create(payload);
+      await this.storeService.storeStatsEditor({
+        _id: result.storeId,
+        targetKey: 'storeProductsCount',
+        modifier: 1,
+      });
+
       return result;
     } catch (err) {
       console.log('Error: createProduct', err.message);

@@ -5,7 +5,7 @@ import { Model, ObjectId } from 'mongoose';
 import { Store } from '../../libs/dto/store/store';
 import { StoreInput, StoresInquiry } from '../../libs/dto/store/store.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
-import { T } from '../../libs/types/common';
+import { StatisticModifier, T } from '../../libs/types/common';
 import { StoreStatus } from '../../libs/enums/store.enum';
 import { ViewService } from '../view/view.service';
 import { ViewInput } from '../../libs/dto/view/view.input';
@@ -103,7 +103,6 @@ export class StoreService {
   }
 
   /* -------------------------------- findStore ------------------------------- */
-
   public async findStore(memberId: ObjectId): Promise<Store> {
     const result: Store | null = await this.storeModel
       .findOne({ ownerId: memberId, storeStatus: StoreStatus.ACTIVE })
@@ -113,6 +112,14 @@ export class StoreService {
     return result;
   }
 
+  /* ---------------------------- storeStatsEditor ---------------------------- */
+  public async storeStatsEditor(input: StatisticModifier): Promise<Store | null> {
+    const { _id, targetKey, modifier } = input;
+    console.log('storeStatsEditor executed');
+    return await this.storeModel
+      .findOneAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
+      .exec();
+  }
   /* -------------------------------------------------------------------------- */
   /*                                  FOR ADMIN                                 */
   /* -------------------------------------------------------------------------- */
