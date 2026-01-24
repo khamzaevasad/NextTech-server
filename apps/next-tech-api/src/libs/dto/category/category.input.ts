@@ -9,9 +9,6 @@ export class CreateCategoryInput {
   @Field(() => String)
   categoryName: string;
 
-  @Field(() => String)
-  categorySlug: string;
-
   @Field(() => String, { nullable: true })
   categoryImage?: string;
 

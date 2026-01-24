@@ -17,8 +17,8 @@ export class StoreResolver {
   constructor(private readonly storeService: StoreService) {}
 
   /**STORE**/
-  @UseGuards(RolesGuard)
   @Roles(MemberType.SELLER)
+  @UseGuards(RolesGuard)
   @Mutation(() => Store)
   /* ------------------------------- createStore ------------------------------ */
   public async createStore(

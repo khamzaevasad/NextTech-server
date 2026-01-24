@@ -8,5 +8,6 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
   imports: [MongooseModule.forFeature([{ name: 'Category', schema: CategorySchema }]), AuthModule],
   providers: [CategoryResolver, CategoryService],
+  exports: [CategoryService],
 })
 export class CategoryModule {}

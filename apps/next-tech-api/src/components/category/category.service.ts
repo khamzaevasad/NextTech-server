@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Categories, Category } from '../../libs/dto/category/category';
@@ -6,6 +6,7 @@ import { CategoriesInquiry, CreateCategoryInput } from '../../libs/dto/category/
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
 import { UpdateCategoryInput } from '../../libs/dto/category/category.update';
+import { generateSlug } from '../../libs/utils/slug.util';
 
 @Injectable()
 export class CategoryService {
@@ -48,11 +49,18 @@ export class CategoryService {
   /* ----------------------------- createCategory ----------------------------- */
   public async createCategory(input: CreateCategoryInput): Promise<Category> {
     try {
-      const result = await this.categoryModel.create(input);
+      const categorySlug = await this.buildUniqueProductSlug(input.categoryName);
+
+      const payload = {
+        ...input,
+        categorySlug,
+      };
+
+      const result = await this.categoryModel.create(payload);
       return result;
     } catch (err) {
       console.log('Error: createCategory', err.message);
-      throw new InternalServerErrorException(Message.CREATE_FAILED);
+      throw new BadRequestException(Message.CREATE_FAILED);
     }
   }
 
@@ -63,5 +71,20 @@ export class CategoryService {
       .exec();
     if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
     return result;
+  }
+
+  /* --------------------- PRIVATE buildUniqueProductSlug --------------------- */
+  private async buildUniqueProductSlug(categorytName: string): Promise<string> {
+    const baseSlug = generateSlug(categorytName);
+
+    let slug = baseSlug;
+    let count = 1;
+
+    while (await this.categoryModel.exists({ productSlug: slug })) {
+      slug = `${baseSlug}-${count}`;
+      count++;
+    }
+
+    return slug;
   }
 }

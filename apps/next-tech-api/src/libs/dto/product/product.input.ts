@@ -37,9 +37,6 @@ export class CreateProductInput {
 
   storeId: ObjectId;
 
-  @Field(() => String, { nullable: true })
-  productSlug?: string;
-
   @Field(() => GraphQLJSON, { nullable: true })
   productSpecs?: Record<string, any>;
 }

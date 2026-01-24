@@ -6,6 +6,7 @@ import ProductSchema from '../../schemas/Product.model';
 import { AuthModule } from '../auth/auth.module';
 import { ViewModule } from '../view/view.module';
 import { StoreModule } from '../store/store.module';
+import { CategoryModule } from '../category/category.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { StoreModule } from '../store/store.module';
     AuthModule,
     ViewModule,
     StoreModule,
+    CategoryModule,
   ],
   providers: [ProductResolver, ProductService],
 })
