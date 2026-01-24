@@ -4,6 +4,7 @@ import * as path from 'path';
 
 /** Sorts**/
 export const availableSellerSorts = ['createdAt', 'updatedAt', 'memberRank'];
+export const sorts = ['createdAt', 'updatedAt'];
 export const availableStoreSorts = [
   'createdAt',
   'updatedAt',

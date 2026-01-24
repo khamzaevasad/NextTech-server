@@ -79,7 +79,6 @@ export class StoreService {
     const { text } = input.search;
     const match: T = { storeStatus: StoreStatus.ACTIVE };
     const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
-    if (text) match.storeName = { $regex: new RegExp(text, 'i') };
 
     const result = await this.storeModel
       .aggregate([

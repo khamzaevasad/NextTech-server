@@ -17,8 +17,8 @@ export class StoreResolver {
   constructor(private readonly storeService: StoreService) {}
 
   /**STORE**/
-  @Roles(MemberType.SELLER)
   @UseGuards(RolesGuard)
+  @Roles(MemberType.SELLER)
   @Mutation(() => Store)
   /* ------------------------------- createStore ------------------------------ */
   public async createStore(
@@ -28,8 +28,8 @@ export class StoreResolver {
     return await this.storeService.createStore(memberId, input);
   }
 
-  @Roles(MemberType.SELLER)
   @UseGuards(RolesGuard)
+  @Roles(MemberType.SELLER)
   @Mutation(() => Store)
   /* ------------------------------- updateStore ------------------------------ */
   public async updateStore(
@@ -65,8 +65,8 @@ export class StoreResolver {
   /*                                  FOR ADMIN                                 */
   /* -------------------------------------------------------------------------- */
 
-  @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
   @Mutation(() => Store)
   public async updateStoreByAdmin(@Args('input') input: StoreUpdateAdmin): Promise<Store> {
     return await this.storeService.updateStoreByAdmin(input);

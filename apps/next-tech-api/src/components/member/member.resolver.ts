@@ -84,16 +84,16 @@ export class MemberResolver {
   /*                                    ADMIN                                   */
   /* -------------------------------------------------------------------------- */
 
-  @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
   @Query(() => Members)
   /* ------------------------- // getAllMembersByAdmin ------------------------ */
   public async getAllMembersByAdmin(@Args('input') input: MembersInquiry): Promise<Members> {
     return await this.memberService.getAllMembersByAdmin(input);
   }
 
-  @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
   @Mutation(() => Member)
   /* ------------------------- // updateMemberByAdmin ------------------------- */
   public async updateMemberByAdmin(@Args('input') input: MemberUpdate): Promise<Member> {
