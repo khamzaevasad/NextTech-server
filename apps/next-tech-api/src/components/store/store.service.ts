@@ -102,6 +102,17 @@ export class StoreService {
     return result[0];
   }
 
+  /* -------------------------------- findStore ------------------------------- */
+
+  public async findStore(memberId: ObjectId): Promise<Store> {
+    const result: Store | null = await this.storeModel
+      .findOne({ ownerId: memberId, storeStatus: StoreStatus.ACTIVE })
+      .exec();
+
+    if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result;
+  }
+
   /* -------------------------------------------------------------------------- */
   /*                                  FOR ADMIN                                 */
   /* -------------------------------------------------------------------------- */

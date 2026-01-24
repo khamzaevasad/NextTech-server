@@ -5,7 +5,7 @@ import { StoreLocation, StoreStatus } from '../../enums/store.enum';
 
 @InputType()
 export class StoreUpdate {
-  // memberUpdate
+  // StoreUpdate
   @IsOptional()
   @Field(() => String, { nullable: true })
   _id?: ObjectId;

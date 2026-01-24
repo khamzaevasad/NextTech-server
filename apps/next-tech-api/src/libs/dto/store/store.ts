@@ -1,9 +1,13 @@
 import { Member, TotalCounter } from './../member/member';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { StoreLocation, StoreStatus } from '../../enums/store.enum';
+import type { ObjectId } from 'mongoose';
 
 @ObjectType()
 export class Store {
+  @Field(() => String)
+  _id: ObjectId;
+
   @Field(() => String)
   storeName: string;
 
