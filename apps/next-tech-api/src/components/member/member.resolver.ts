@@ -7,7 +7,7 @@ import {
   SellersInquiry,
 } from '../../libs/dto/member/member.input';
 import { Member, Members } from '../../libs/dto/member/member';
-import { UseGuards } from '@nestjs/common';
+import { InternalServerErrorException, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/guards/auth.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -19,8 +19,10 @@ import { shapeIntoMongoObjectId } from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
 import { createWriteStream } from 'fs';
+import * as fs from 'fs';
 import { Message } from '../../libs/enums/common.enum';
 import { getSerialForImage, validMimeTypes } from '../../libs/config';
+import * as path from 'path';
 @Resolver()
 export class MemberResolver {
   constructor(private readonly memberService: MemberService) {}
@@ -131,43 +133,66 @@ export class MemberResolver {
   }
 
   @UseGuards(AuthGuard)
-  @Mutation((returns) => [String])
+  @Mutation(() => [String])
   public async imagesUploader(
     @Args('files', { type: () => [GraphQLUpload] })
     files: Promise<FileUpload>[],
-    @Args('target') target: String,
+    @Args('target') target: string,
   ): Promise<string[]> {
-    console.log('Mutation: imagesUploader');
+    console.log('=== IMAGES UPLOADER ===');
+    console.log('Files count:', files.length);
+
+    const uploadDir = path.join(process.cwd(), 'uploads', target);
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
 
     const uploadedImages: string[] = [];
-    const promisedList = files.map(
-      async (img: Promise<FileUpload>, index: number): Promise<Promise<void>> => {
-        try {
-          const { filename, mimetype, encoding, createReadStream } = await img;
 
-          const validMime = validMimeTypes.includes(mimetype);
-          if (!validMime) throw new Error(Message.PROVIDE_ALLOWED_FORMAT);
+    for (const [index, filePromise] of files.entries()) {
+      try {
+        const file = await filePromise;
 
-          const imageName = getSerialForImage(filename);
-          const url = `uploads/${target}/${imageName}`;
-          const stream = createReadStream();
-
-          const result = await new Promise((resolve, reject) => {
-            stream
-              .pipe(createWriteStream(url))
-              .on('finish', () => resolve(true))
-              .on('error', () => reject(false));
-          });
-          if (!result) throw new Error(Message.UPLOAD_FAILED);
-
-          uploadedImages[index] = url;
-        } catch (err) {
-          console.log('Error, file missing!');
+        if (!file || !file.filename) {
+          console.log(`⚠️ Skipping empty slot [${index}]`);
+          continue;
         }
-      },
-    );
 
-    await Promise.all(promisedList);
+        const { filename, createReadStream } = file;
+        console.log(`📤 Uploading [${index}]:`, filename);
+
+        const ext = path.extname(filename).toLowerCase();
+        if (!['.png', '.jpg', '.jpeg'].includes(ext)) {
+          console.log(`⚠️ Invalid extension [${index}]:`, ext);
+          continue;
+        }
+
+        const imageName = getSerialForImage(filename);
+        const filePath = path.join(uploadDir, imageName);
+        const stream = createReadStream();
+
+        await new Promise<void>((resolve, reject) => {
+          stream
+            .pipe(createWriteStream(filePath))
+            .on('finish', () => {
+              console.log(`✅ Saved [${index}]:`, imageName);
+              resolve();
+            })
+            .on('error', reject);
+        });
+
+        uploadedImages.push(`uploads/${target}/${imageName}`);
+      } catch (error) {
+        console.log(`⚠️ Skipping file [${index}]:`, error.message);
+        continue; // Xato bo'lsa keyingisiga o'tish
+      }
+    }
+
+    if (uploadedImages.length === 0) {
+      throw new Error('No valid files were uploaded');
+    }
+
+    console.log(`✅ Uploaded ${uploadedImages.length} files`);
     return uploadedImages;
   }
 }
