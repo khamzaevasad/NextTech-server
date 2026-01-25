@@ -3,6 +3,7 @@ import { ProductStatus } from './../../enums/product.enum';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { GraphQLJSON } from 'graphql-scalars';
 import { Store } from '../store/store';
+import { TotalCounter } from '../member/member';
 
 @ObjectType()
 export class Product {
@@ -63,4 +64,13 @@ export class Product {
   /* ---------------------------- FROM AGGREGATION ---------------------------- */
   @Field(() => Store, { nullable: true })
   storeData?: Store;
+}
+
+@ObjectType()
+export class Products {
+  @Field(() => [Product])
+  list: Product[];
+
+  @Field(() => [TotalCounter], { nullable: true })
+  metaCounter: TotalCounter[];
 }

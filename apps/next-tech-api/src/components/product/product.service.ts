@@ -7,9 +7,9 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { Product } from '../../libs/dto/product/product';
-import { CreateProductInput } from '../../libs/dto/product/product.input';
-import { Message } from '../../libs/enums/common.enum';
+import { Product, Products } from '../../libs/dto/product/product';
+import { CreateProductInput, ProductsInquiry } from '../../libs/dto/product/product.input';
+import { Direction, Message } from '../../libs/enums/common.enum';
 import { StoreService } from '../store/store.service';
 import { CategoryService } from '../category/category.service';
 import { Category } from '../../libs/dto/category/category';
@@ -20,7 +20,7 @@ import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
 import { UpdateProductInput } from '../../libs/dto/product/product.update';
-import { shapeIntoMongoObjectId } from '../../libs/config';
+import { lookupStoreProduct, shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class ProductService {
@@ -131,6 +131,37 @@ export class ProductService {
 
     return result;
   }
+  /* ------------------------------- getProducts ------------------------------ */
+  public async getProducts(memberId: ObjectId, input: ProductsInquiry): Promise<Products> {
+    const match: T = { productStatus: ProductStatus.ACTIVE };
+    const sort: T = { [input?.sort ?? 'createdAt']: input.direction ?? Direction.DESC };
+
+    this.shapeMatchQuery(match, input);
+
+    const result = await this.productModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              // TODO: meliked logic
+              lookupStoreProduct,
+              { $unwind: '$storeData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    return result[0];
+  }
+
   /* --------------------------- productStatsEditor --------------------------- */
   public async productStatsEditor(input: StatisticModifier): Promise<Product | null> {
     const { _id, targetKey, modifier } = input;
@@ -138,6 +169,35 @@ export class ProductService {
     return await this.productModel
       .findOneAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
       .exec();
+  }
+
+  /* ------------------------- PRIVATE shapeMatchQuery ------------------------ */
+  private shapeMatchQuery(match: T, input: ProductsInquiry): void {
+    const { categoryId, storeId, priceRange, specs, text, brands } = input.search;
+
+    if (categoryId) {
+      match.productCategory = shapeIntoMongoObjectId(categoryId);
+    }
+    if (storeId) {
+      match.storeId = shapeIntoMongoObjectId(storeId);
+    }
+    if (brands?.length) {
+      match.productBrand = { $in: brands };
+    }
+
+    if (priceRange) {
+      match.productPrice = { $gte: priceRange.start, $lte: priceRange.end };
+    }
+
+    if (text) {
+      match.productName = { $regex: new RegExp(text, 'i') };
+    }
+
+    if (specs?.length) {
+      match.$and = specs.map((spec) => ({
+        [`productSpecs.${spec.key}`]: { $in: spec.values },
+      }));
+    }
   }
 
   /* ------------------------ PRIVATE buildProductSpecs ----------------------- */

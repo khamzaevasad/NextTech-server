@@ -3,8 +3,8 @@ import { ProductService } from './product.service';
 import { UseGuards } from '@nestjs/common';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
-import { Product } from '../../libs/dto/product/product';
-import { CreateProductInput } from '../../libs/dto/product/product.input';
+import { Product, Products } from '../../libs/dto/product/product';
+import { CreateProductInput, ProductsInquiry } from '../../libs/dto/product/product.input';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
@@ -48,5 +48,15 @@ export class ProductResolver {
   ): Promise<Product> {
     input._id = shapeIntoMongoObjectId(input._id);
     return await this.productService.updateProduct(memberId, input);
+  }
+
+  @UseGuards(WithoutGuard)
+  @Query(() => Products)
+  /* ------------------------------- getProducts ------------------------------ */
+  public async getProducts(
+    @Args('input') input: ProductsInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Products> {
+    return await this.productService.getProducts(memberId, input);
   }
 }

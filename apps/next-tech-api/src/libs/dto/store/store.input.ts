@@ -3,6 +3,7 @@ import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import type { ObjectId } from 'mongoose';
 import { availableStoreSorts } from '../../config';
 import { Direction } from '../../enums/common.enum';
+import { StoreLocation } from '../../enums/store.enum';
 @InputType()
 export class StoreInput {
   // create store
@@ -33,6 +34,11 @@ export class StoreInput {
   @Length(3, 12)
   @Field(() => String)
   storeAddress: string;
+
+  @IsNotEmpty()
+  @Length(3, 12)
+  @Field(() => StoreLocation)
+  storeLocation: StoreLocation;
 }
 
 /**Inquiry**/
@@ -63,7 +69,6 @@ export class StoresInquiry {
   sort?: string;
 
   @IsOptional()
-  @IsIn([availableStoreSorts])
   @Field(() => Direction, { nullable: true })
   direction?: string;
 

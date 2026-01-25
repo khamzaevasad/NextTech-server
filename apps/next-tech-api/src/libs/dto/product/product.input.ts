@@ -1,7 +1,9 @@
 import { Field, InputType, Int, Float } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import type { ObjectId } from 'mongoose';
 import { GraphQLJSON } from 'graphql-scalars';
+import { availableProductSorts } from '../../config';
+import { Direction } from '../../enums/common.enum';
 @InputType()
 export class CreateProductInput {
   @IsNotEmpty()
@@ -39,4 +41,73 @@ export class CreateProductInput {
 
   @Field(() => GraphQLJSON, { nullable: true })
   productSpecs?: Record<string, any>;
+}
+/* -------------------------------------------------------------------------- */
+/*                               ProductsInquiry                              */
+/* -------------------------------------------------------------------------- */
+
+@InputType()
+export class PriceRange {
+  @Field(() => Int)
+  start: number;
+
+  @Field(() => Int)
+  end: number;
+}
+
+@InputType()
+export class SpecFilterInput {
+  @Field(() => String)
+  key: string;
+
+  @Field(() => [String])
+  values: string[];
+}
+
+@InputType()
+export class SearchProduct {
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  storeId?: ObjectId;
+
+  @Field(() => String, { nullable: true })
+  categoryId?: ObjectId;
+
+  @Field(() => PriceRange, { nullable: true })
+  priceRange?: PriceRange;
+
+  @Field(() => [SpecFilterInput], { nullable: true })
+  specs?: SpecFilterInput[];
+
+  @Field(() => [String], { nullable: true })
+  brands?: string[];
+
+  @Field(() => String, { nullable: true })
+  text?: string;
+}
+
+@InputType()
+export class ProductsInquiry {
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
+
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(availableProductSorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: string;
+
+  @IsNotEmpty()
+  @Field(() => SearchProduct)
+  search: SearchProduct;
 }

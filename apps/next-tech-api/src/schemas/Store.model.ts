@@ -30,9 +30,15 @@ const StoreSchema = new Schema({
   },
   storeAddress: {
     type: String,
+    required: true,
+  },
+
+  storeLocation: {
+    type: String,
     enum: StoreLocation,
     required: true,
   },
+
   storeProductsCount: {
     type: Number,
     default: 0,

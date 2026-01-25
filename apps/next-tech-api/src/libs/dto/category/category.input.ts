@@ -43,12 +43,11 @@ export class CategoriesInquiry {
   limit: number;
 
   @IsOptional()
-  @IsIn([sorts])
+  @IsIn([])
   @Field(() => String, { nullable: true })
   sort?: string;
 
   @IsOptional()
-  @IsIn([sorts])
   @Field(() => Direction, { nullable: true })
   direction?: string;
 

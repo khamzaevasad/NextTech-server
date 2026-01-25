@@ -158,33 +158,56 @@ export class MemberResolver {
           continue;
         }
 
-        const { filename, createReadStream } = file;
-        console.log(`📤 Uploading [${index}]:`, filename);
+        const { filename, mimetype, createReadStream } = file;
+        console.log(`📤 Uploading [${index}]:`, filename, 'MIME:', mimetype);
 
-        const ext = path.extname(filename).toLowerCase();
-        if (!['.png', '.jpg', '.jpeg'].includes(ext)) {
-          console.log(`⚠️ Invalid extension [${index}]:`, ext);
+        // ✅ MIME type tekshirish (extension'dan ishonchliroq)
+        if (!['image/png', 'image/jpg', 'image/jpeg', 'image/webp'].includes(mimetype)) {
+          console.log(`⚠️ Invalid MIME type [${index}]:`, mimetype);
           continue;
         }
 
+        const ext = path.extname(filename).toLowerCase();
         const imageName = getSerialForImage(filename);
         const filePath = path.join(uploadDir, imageName);
+
+        // ✅ Stream'ni to'g'ri handle qilish
         const stream = createReadStream();
+        const writeStream = createWriteStream(filePath);
 
         await new Promise<void>((resolve, reject) => {
           stream
-            .pipe(createWriteStream(filePath))
+            .on('error', (error) => {
+              console.error(`❌ Read stream error [${index}]:`, error);
+              writeStream.destroy();
+              reject(error);
+            })
+            .pipe(writeStream)
+            .on('error', (error) => {
+              console.error(`❌ Write stream error [${index}]:`, error);
+              reject(error);
+            })
             .on('finish', () => {
               console.log(`✅ Saved [${index}]:`, imageName);
+
+              // ✅ File size tekshirish
+              const stats = fs.statSync(filePath);
+              console.log(`   Size: ${(stats.size / 1024).toFixed(2)} KB`);
+
+              if (stats.size === 0) {
+                fs.unlinkSync(filePath);
+                reject(new Error('File is empty'));
+                return;
+              }
+
               resolve();
-            })
-            .on('error', reject);
+            });
         });
 
         uploadedImages.push(`uploads/${target}/${imageName}`);
       } catch (error) {
-        console.log(`⚠️ Skipping file [${index}]:`, error.message);
-        continue; // Xato bo'lsa keyingisiga o'tish
+        console.log(`❌ Failed to upload file [${index}]:`, error.message);
+        continue;
       }
     }
 
