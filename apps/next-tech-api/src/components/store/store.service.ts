@@ -45,7 +45,7 @@ export class StoreService {
   }
 
   /* -------------------------------- getStore -------------------------------- */
-  public async getStore(memberId: ObjectId, storeId: ObjectId): Promise<Store> {
+  public async getStore(memberId: ObjectId | null, storeId: ObjectId): Promise<Store> {
     const search: T = {
       _id: storeId,
       storeStatus: {

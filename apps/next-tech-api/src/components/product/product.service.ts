@@ -13,6 +13,11 @@ import { StoreService } from '../store/store.service';
 import { CategoryService } from '../category/category.service';
 import { Category } from '../../libs/dto/category/category';
 import { generateSlug } from '../../libs/utils/slug.util';
+import { StatisticModifier, T } from '../../libs/types/common';
+import { ProductStatus } from '../../libs/enums/product.enum';
+import { ViewInput } from '../../libs/dto/view/view.input';
+import { ViewGroup } from '../../libs/enums/view.enum';
+import { ViewService } from '../view/view.service';
 
 @Injectable()
 export class ProductService {
@@ -20,10 +25,10 @@ export class ProductService {
     @InjectModel('Product') private readonly productModel: Model<Product>,
     private readonly storeService: StoreService,
     private readonly categoryService: CategoryService,
+    private readonly viewService: ViewService,
   ) {}
 
   /* ------------------------------ createProduct ----------------------------- */
-
   public async createProduct(memberId: ObjectId, input: CreateProductInput): Promise<Product> {
     try {
       const store = await this.storeService.findStore(memberId);
@@ -58,6 +63,47 @@ export class ProductService {
       console.log('Error: createProduct', err.message);
       throw new ForbiddenException(Message.CREATE_FAILED);
     }
+  }
+
+  /* ------------------------------- getProduct ------------------------------- */
+  public async getProduct(memberId: ObjectId, productId: ObjectId): Promise<Product | null> {
+    const search: T = {
+      _id: productId,
+      productStatus: ProductStatus.ACTIVE,
+    };
+
+    const targetProduct: Product | null = await this.productModel.findOne(search).lean().exec();
+
+    if (!targetProduct) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    if (memberId) {
+      const viewInput: ViewInput = {
+        memberId: memberId,
+        viewRefId: productId,
+        viewGroup: ViewGroup.PRODUCT,
+      };
+      const newView = await this.viewService.recordView(viewInput);
+
+      if (newView) {
+        await this.productStatsEditor({ _id: productId, targetKey: 'productViews', modifier: 1 });
+        targetProduct.productViews = (targetProduct.productViews ?? 0) + 1;
+      }
+
+      // meLiked
+    }
+
+    targetProduct.storeData = await this.storeService.getStore(null, targetProduct.storeId);
+
+    return targetProduct;
+  }
+
+  /* --------------------------- productStatsEditor --------------------------- */
+  public async productStatsEditor(input: StatisticModifier): Promise<Product | null> {
+    const { _id, targetKey, modifier } = input;
+    console.log('productStatsEditor executed');
+    return await this.productModel
+      .findOneAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
+      .exec();
   }
 
   /* ------------------------ PRIVATE buildProductSpecs ----------------------- */

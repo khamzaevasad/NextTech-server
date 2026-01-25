@@ -2,6 +2,7 @@ import type { ObjectId } from 'mongoose';
 import { ProductStatus } from './../../enums/product.enum';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { GraphQLJSON } from 'graphql-scalars';
+import { Store } from '../store/store';
 
 @ObjectType()
 export class Product {
@@ -58,4 +59,8 @@ export class Product {
 
   @Field(() => Date)
   updatedAt: Date;
+
+  /* ---------------------------- FROM AGGREGATION ---------------------------- */
+  @Field(() => Store, { nullable: true })
+  storeData?: Store;
 }
