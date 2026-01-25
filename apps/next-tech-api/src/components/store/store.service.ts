@@ -1,5 +1,5 @@
 import { Stores } from './../../libs/dto/store/store';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Store } from '../../libs/dto/store/store';
@@ -108,7 +108,7 @@ export class StoreService {
       .findOne({ ownerId: memberId, storeStatus: StoreStatus.ACTIVE })
       .exec();
 
-    if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    if (!result) throw new NotFoundException(Message.NO_STORE);
     return result;
   }
 

@@ -10,6 +10,7 @@ import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
+import { UpdateProductInput } from '../../libs/dto/product/product.update';
 
 @Resolver()
 export class ProductResolver {
@@ -26,14 +27,26 @@ export class ProductResolver {
     return await this.productService.createProduct(memberId, input);
   }
 
-  /* ------------------------------- getProduct ------------------------------- */
   @UseGuards(WithoutGuard)
   @Query(() => Product)
+  /* ------------------------------- getProduct ------------------------------- */
   public async getProduct(
     @Args('input') input: string,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Product | null> {
     const productId = shapeIntoMongoObjectId(input);
     return await this.productService.getProduct(memberId, productId);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.SELLER)
+  @Mutation(() => Product)
+  /* ------------------------------ updateProduct ----------------------------- */
+  public async updateProduct(
+    @Args('input') input: UpdateProductInput,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Product> {
+    input._id = shapeIntoMongoObjectId(input._id);
+    return await this.productService.updateProduct(memberId, input);
   }
 }

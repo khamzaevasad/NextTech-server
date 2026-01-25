@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
@@ -18,6 +19,8 @@ import { ProductStatus } from '../../libs/enums/product.enum';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
+import { UpdateProductInput } from '../../libs/dto/product/product.update';
+import { shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class ProductService {
@@ -32,6 +35,7 @@ export class ProductService {
   public async createProduct(memberId: ObjectId, input: CreateProductInput): Promise<Product> {
     try {
       const store = await this.storeService.findStore(memberId);
+      console.log('store', store);
       if (!store) throw new ForbiddenException(Message.NO_STORE);
 
       const category = await this.categoryService.getCategoryById(input.productCategory);
@@ -55,13 +59,13 @@ export class ProductService {
       await this.storeService.storeStatsEditor({
         _id: result.storeId,
         targetKey: 'storeProductsCount',
-        modifier: 1,
+        modifier: payload.productStock,
       });
 
       return result;
     } catch (err) {
       console.log('Error: createProduct', err.message);
-      throw new ForbiddenException(Message.CREATE_FAILED);
+      throw err;
     }
   }
 
@@ -97,6 +101,36 @@ export class ProductService {
     return targetProduct;
   }
 
+  /* ------------------------------ updateProduct ----------------------------- */
+  public async updateProduct(memberId: ObjectId, input: UpdateProductInput): Promise<Product> {
+    const store = await this.storeService.findStore(memberId);
+    if (!store) throw new ForbiddenException(Message.NO_STORE);
+
+    const search: T = {
+      _id: input._id,
+      storeId: store._id,
+      productStatus: ProductStatus.ACTIVE,
+    };
+
+    const oldProduct = await this.productModel.findOne(search).exec();
+    if (!oldProduct) throw new NotFoundException(Message.NO_DATA_FOUND);
+
+    const result = await this.productModel.findOneAndUpdate(search, input, { new: true }).exec();
+
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+    if (input.productStock !== undefined && input.productStock !== oldProduct.productStock) {
+      const stockDifference = input.productStock - oldProduct.productStock;
+
+      await this.storeService.storeStatsEditor({
+        _id: result.storeId,
+        targetKey: 'storeProductsCount',
+        modifier: stockDifference,
+      });
+    }
+
+    return result;
+  }
   /* --------------------------- productStatsEditor --------------------------- */
   public async productStatsEditor(input: StatisticModifier): Promise<Product | null> {
     const { _id, targetKey, modifier } = input;
