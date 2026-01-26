@@ -8,7 +8,11 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Product, Products } from '../../libs/dto/product/product';
-import { CreateProductInput, ProductsInquiry } from '../../libs/dto/product/product.input';
+import {
+  CreateProductInput,
+  ProductsInquiry,
+  SellerProductInquiry,
+} from '../../libs/dto/product/product.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { StoreService } from '../store/store.service';
 import { CategoryService } from '../category/category.service';
@@ -162,6 +166,48 @@ export class ProductService {
     return result[0];
   }
 
+  /* ---------------------------- getSellerProducts --------------------------- */
+  public async getSellerProducts(
+    memberId: ObjectId,
+    input: SellerProductInquiry,
+  ): Promise<Products> {
+    const store = await this.storeService.findStore(memberId);
+    if (!store) throw new ForbiddenException(Message.NO_STORE);
+
+    const { productStatus } = input.search;
+    if (productStatus === ProductStatus.DELETED)
+      throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
+
+    const match: T = {
+      storeId: store._id,
+      productStatus: productStatus ?? { $ne: ProductStatus.DELETED },
+    };
+
+    const sort: T = { [input?.sort ?? 'createdAt']: input.direction ?? Direction.DESC };
+
+    const result = await this.productModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupStoreProduct,
+              { $unwind: '$storeData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    return result[0];
+  }
+
   /* --------------------------- productStatsEditor --------------------------- */
   public async productStatsEditor(input: StatisticModifier): Promise<Product | null> {
     const { _id, targetKey, modifier } = input;
@@ -236,4 +282,8 @@ export class ProductService {
 
     return slug;
   }
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  FOR ADMIN                                 */
+  /* -------------------------------------------------------------------------- */
 }

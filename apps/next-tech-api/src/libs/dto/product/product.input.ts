@@ -4,6 +4,7 @@ import type { ObjectId } from 'mongoose';
 import { GraphQLJSON } from 'graphql-scalars';
 import { availableProductSorts } from '../../config';
 import { Direction } from '../../enums/common.enum';
+import { ProductStatus } from '../../enums/product.enum';
 @InputType()
 export class CreateProductInput {
   @IsNotEmpty()
@@ -110,4 +111,41 @@ export class ProductsInquiry {
   @IsNotEmpty()
   @Field(() => SearchProduct)
   search: SearchProduct;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                 FOR SELLERS                                */
+/* -------------------------------------------------------------------------- */
+
+@InputType()
+class SearchProductSeller {
+  @IsOptional()
+  @Field(() => ProductStatus, { nullable: true })
+  productStatus?: ProductStatus;
+}
+
+@InputType()
+export class SellerProductInquiry {
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
+
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(availableProductSorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: string;
+
+  @IsNotEmpty()
+  @Field(() => SearchProductSeller)
+  search: SearchProductSeller;
 }
