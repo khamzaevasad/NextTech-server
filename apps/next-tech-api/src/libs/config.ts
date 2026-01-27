@@ -2,7 +2,9 @@ import { ObjectId } from 'bson';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 
-/* ---------------------------------- Sorts --------------------------------- */
+/* -------------------------------------------------------------------------- */
+/*                                  FOR SORTS                                 */
+/* -------------------------------------------------------------------------- */
 export const availableSellerSorts = ['createdAt', 'updatedAt', 'memberRank'];
 export const sorts = ['createdAt', 'updatedAt'];
 export const availableStoreSorts = [
@@ -14,16 +16,24 @@ export const availableStoreSorts = [
 ];
 export const availableProductSorts = ['createdAt', 'updatedAt', 'productViews', 'productLikes'];
 
+export const availableMemberSorts = ['createdAt', 'updatedAt'];
+export const shapeIntoMongoObjectId = (target: any) => {
+  return typeof target === 'string' ? new ObjectId(target) : target;
+};
+
+/* -------------------------------------------------------------------------- */
+/*                                FOR UPLOADER                                */
+/* -------------------------------------------------------------------------- */
+
 export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp'];
 export const getSerialForImage = (filename: string) => {
   const ext = path.parse(filename).ext;
   return uuidv4() + ext;
 };
 
-export const availableMemberSorts = ['createdAt', 'updatedAt'];
-export const shapeIntoMongoObjectId = (target: any) => {
-  return typeof target === 'string' ? new ObjectId(target) : target;
-};
+/* -------------------------------------------------------------------------- */
+/*                               FOR AGGREGATION                              */
+/* -------------------------------------------------------------------------- */
 
 // lookupMember
 export const lookupMember = {
