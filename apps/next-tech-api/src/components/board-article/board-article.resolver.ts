@@ -67,8 +67,8 @@ export class BoardArticleResolver {
   /*                                  FOR ADMIN                                 */
   /* -------------------------------------------------------------------------- */
 
-  @Roles(MemberType.ADMIN)
   @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
   @Query(() => BoardArticles)
   /* ----------------------- getAllBoardArticlesByAdmin ----------------------- */
   public async getAllBoardArticlesByAdmin(
@@ -76,5 +76,17 @@ export class BoardArticleResolver {
     // @AuthMember('_id') memberId: ObjectId,
   ): Promise<BoardArticles> {
     return await this.boardArticleService.getAllBoardArticlesByAdmin(input);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Mutation(() => BoardArticle)
+  /* ------------------------ updateBoardArticleByAdmin ----------------------- */
+  public async updateBoardArticleByAdmin(
+    @Args('input') input: BoardArticleUpdate,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<BoardArticle> {
+    input._id = shapeIntoMongoObjectId(input._id);
+    return await this.boardArticleService.updateBoardArticleByAdmin(input);
   }
 }
