@@ -5,6 +5,7 @@ import { ViewService } from '../view/view.service';
 import { Model, ObjectId } from 'mongoose';
 import { MemberService } from '../member/member.service';
 import {
+  AllBoardArticlesInquiry,
   BoardArticleInput,
   BoardArticlesInquiry,
 } from '../../libs/dto/board-article/board-article.input';
@@ -144,6 +145,42 @@ export class BoardArticleService {
       .exec();
 
     if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result[0];
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  FOR ADMIN                                 */
+  /* -------------------------------------------------------------------------- */
+
+  /* ----------------------- getAllBoardArticlesByAdmin ----------------------- */
+  public async getAllBoardArticlesByAdmin(input: AllBoardArticlesInquiry): Promise<BoardArticles> {
+    const { articleCategory, articleStatus } = input.search;
+    const match: T = {};
+    const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+    if (articleCategory) match.articleCategory = articleCategory;
+    if (articleStatus) match.articleStatus = articleStatus;
+
+    const result = await this.boardArticleModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupMemberArticle,
+              { $unwind: '$memberData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
     return result[0];
   }
 

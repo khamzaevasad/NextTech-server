@@ -17,6 +17,12 @@ export const availableStoreSorts = [
 export const availableProductSorts = ['createdAt', 'updatedAt', 'productViews', 'productLikes'];
 
 export const availableMemberSorts = ['createdAt', 'updatedAt'];
+export const availableBoardArticleSorts = [
+  'createdAt',
+  'updatedAt',
+  'articleLikes',
+  'articleViews',
+];
 export const shapeIntoMongoObjectId = (target: any) => {
   return typeof target === 'string' ? new ObjectId(target) : target;
 };
