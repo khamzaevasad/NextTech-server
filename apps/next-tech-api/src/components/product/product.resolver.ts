@@ -101,4 +101,13 @@ export class ProductResolver {
     input._id = shapeIntoMongoObjectId(input._id);
     return await this.productService.updateProductByAdmin(input);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Mutation(() => Product)
+  /* -------------------------- removeProductByAdmin -------------------------- */
+  public async removeProductByAdmin(@Args('productId') input: string): Promise<Product> {
+    const productId = shapeIntoMongoObjectId(input);
+    return await this.productService.removeProductByAdmin(productId);
+  }
 }

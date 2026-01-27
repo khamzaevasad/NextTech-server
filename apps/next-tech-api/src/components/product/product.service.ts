@@ -344,4 +344,12 @@ export class ProductService {
 
     return result;
   }
+
+  /* -------------------------- removeProductByAdmin -------------------------- */
+  public async removeProductByAdmin(productId: ObjectId): Promise<Product> {
+    const search: T = { _id: productId, productStatus: ProductStatus.DELETED };
+    const result = await this.productModel.findOneAndDelete(search).exec();
+    if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+    return result;
+  }
 }
