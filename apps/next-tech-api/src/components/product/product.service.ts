@@ -24,7 +24,7 @@ import { ProductStatus } from '../../libs/enums/product.enum';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
-import { UpdateProductInput } from '../../libs/dto/product/product.update';
+import { UpdateProductInput, UpdateProductInputAdmin } from '../../libs/dto/product/product.update';
 import { complexLookupStore, lookupStoreProduct, shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
@@ -314,5 +314,34 @@ export class ProductService {
       .exec();
     if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     return result[0];
+  }
+
+  /* -------------------------- updateProductByAdmin -------------------------- */
+  public async updateProductByAdmin(input: UpdateProductInputAdmin): Promise<Product> {
+    const { productStatus, productStock } = input;
+
+    const search: T = {
+      _id: input._id,
+      // productStatus: ProductStatus.ACTIVE,
+    };
+
+    const oldProduct = await this.productModel.findOne(search).exec();
+    if (!oldProduct) throw new NotFoundException(Message.NO_DATA_FOUND);
+
+    const result = await this.productModel.findOneAndUpdate(search, input, { new: true }).exec();
+
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+
+    if (productStock !== undefined && productStock !== oldProduct.productStock) {
+      const stockDifference = productStock - oldProduct.productStock;
+
+      await this.storeService.storeStatsEditor({
+        _id: result.storeId,
+        targetKey: 'storeProductsCount',
+        modifier: stockDifference,
+      });
+    }
+
+    return result;
   }
 }

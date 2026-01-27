@@ -9,3 +9,13 @@ export class UpdateProductInput extends PartialType(
   @Field(() => String)
   _id: ObjectId;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                  FOR ADMIN                                 */
+/* -------------------------------------------------------------------------- */
+
+@InputType()
+export class UpdateProductInputAdmin extends PartialType(CreateProductInput) {
+  @Field(() => String)
+  _id: ObjectId;
+}

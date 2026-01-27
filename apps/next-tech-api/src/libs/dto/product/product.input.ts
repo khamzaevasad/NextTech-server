@@ -42,6 +42,10 @@ export class CreateProductInput {
 
   @Field(() => GraphQLJSON, { nullable: true })
   productSpecs?: Record<string, any>;
+
+  @IsOptional()
+  @Field(() => ProductStatus, { nullable: true })
+  productStatus?: ProductStatus;
 }
 /* -------------------------------------------------------------------------- */
 /*                               ProductsInquiry                              */

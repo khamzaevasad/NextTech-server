@@ -15,7 +15,7 @@ import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
-import { UpdateProductInput } from '../../libs/dto/product/product.update';
+import { UpdateProductInput, UpdateProductInputAdmin } from '../../libs/dto/product/product.update';
 
 @Resolver()
 export class ProductResolver {
@@ -89,5 +89,16 @@ export class ProductResolver {
     // @AuthMember('_id') memberId: ObjectId,
   ): Promise<Products> {
     return await this.productService.getAllProductsByAdmin(input);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Mutation(() => Product)
+  /* -------------------------- updateProductByAdmin -------------------------- */
+  public async updateProductByAdmin(
+    @Args('input') input: UpdateProductInputAdmin,
+  ): Promise<Product> {
+    input._id = shapeIntoMongoObjectId(input._id);
+    return await this.productService.updateProductByAdmin(input);
   }
 }
