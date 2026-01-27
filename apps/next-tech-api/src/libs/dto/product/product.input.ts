@@ -149,3 +149,40 @@ export class SellerProductInquiry {
   @Field(() => SearchProductSeller)
   search: SearchProductSeller;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                  FOR ADMIN                                 */
+/* -------------------------------------------------------------------------- */
+
+@InputType()
+class SearchProductsAdmin {
+  @IsOptional()
+  @Field(() => ProductStatus, { nullable: true })
+  productStatus?: ProductStatus;
+}
+
+@InputType()
+export class AllProductsInquiry {
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
+
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(availableProductSorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: string;
+
+  @IsNotEmpty()
+  @Field(() => SearchProductSeller)
+  search: SearchProductsAdmin;
+}

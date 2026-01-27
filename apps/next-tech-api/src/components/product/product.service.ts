@@ -9,6 +9,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Product, Products } from '../../libs/dto/product/product';
 import {
+  AllProductsInquiry,
   CreateProductInput,
   ProductsInquiry,
   SellerProductInquiry,
@@ -286,4 +287,32 @@ export class ProductService {
   /* -------------------------------------------------------------------------- */
   /*                                  FOR ADMIN                                 */
   /* -------------------------------------------------------------------------- */
+
+  /* -------------------------- getAllProductsByAdmin ------------------------- */
+  public async getAllProductsByAdmin(input: AllProductsInquiry): Promise<Products> {
+    const { productStatus } = input.search;
+    const match: T = {};
+    const sort: T = { [input?.sort ?? 'createdAt']: input.direction ?? Direction.DESC };
+
+    if (productStatus) match.productStatus = productStatus;
+    const result = await this.productModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupStoreProduct,
+              { $unwind: '$storeData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result[0];
+  }
 }

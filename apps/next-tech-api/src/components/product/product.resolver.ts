@@ -5,6 +5,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { Product, Products } from '../../libs/dto/product/product';
 import {
+  AllProductsInquiry,
   CreateProductInput,
   ProductsInquiry,
   SellerProductInquiry,
@@ -73,5 +74,20 @@ export class ProductResolver {
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Products> {
     return await this.productService.getSellerProducts(memberId, input);
+  }
+
+  /* -------------------------------------------------------------------------- */
+  /*                                  FOR ADMIN                                 */
+  /* -------------------------------------------------------------------------- */
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Query(() => Products)
+  /* -------------------------- getAllProductsByAdmin ------------------------- */
+  public async getAllProductsByAdmin(
+    @Args('input') input: AllProductsInquiry,
+    // @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Products> {
+    return await this.productService.getAllProductsByAdmin(input);
   }
 }
