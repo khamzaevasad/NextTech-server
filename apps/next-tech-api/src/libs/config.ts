@@ -45,6 +45,15 @@ export const lookupMember = {
   },
 };
 
+export const lookupMemberArticle = {
+  $lookup: {
+    from: 'members',
+    localField: 'memberId',
+    foreignField: '_id',
+    as: 'memberData',
+  },
+};
+
 // lookupStore
 export const lookupStore = {
   $lookup: {
