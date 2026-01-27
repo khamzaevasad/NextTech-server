@@ -54,3 +54,25 @@ export const lookupStoreProduct = {
     as: 'storeData',
   },
 };
+
+// complexLookupStore
+export const complexLookupStore = {
+  $lookup: {
+    from: 'stores',
+    let: { storeId: '$storeId' },
+    pipeline: [
+      { $match: { $expr: { $eq: ['$_id', '$$storeId'] } } },
+
+      {
+        $lookup: {
+          from: 'members',
+          localField: 'ownerId',
+          foreignField: '_id',
+          as: 'ownerData',
+        },
+      },
+      { $unwind: '$ownerData' },
+    ],
+    as: 'storeData',
+  },
+};

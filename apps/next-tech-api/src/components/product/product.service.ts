@@ -25,7 +25,7 @@ import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
 import { UpdateProductInput } from '../../libs/dto/product/product.update';
-import { lookupStoreProduct, shapeIntoMongoObjectId } from '../../libs/config';
+import { complexLookupStore, lookupStoreProduct, shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class ProductService {
@@ -304,7 +304,7 @@ export class ProductService {
             list: [
               { $skip: (input.page - 1) * input.limit },
               { $limit: input.limit },
-              lookupStoreProduct,
+              complexLookupStore,
               { $unwind: '$storeData' },
             ],
             metaCounter: [{ $count: 'total' }],
