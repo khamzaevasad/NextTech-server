@@ -162,6 +162,7 @@ export class MemberService {
     return result;
   }
 
+  /* ---------------------------- memberStatsEditor --------------------------- */
   public async memberStatsEditor(input: StatisticModifier): Promise<Member | null> {
     const { _id, targetKey, modifier } = input;
     console.log('memberStatsEditor executed');
