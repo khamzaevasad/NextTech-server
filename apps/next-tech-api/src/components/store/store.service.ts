@@ -117,7 +117,7 @@ export class StoreService {
     const { _id, targetKey, modifier } = input;
     console.log('storeStatsEditor executed');
     return await this.storeModel
-      .findOneAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
+      .findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
       .exec();
   }
 

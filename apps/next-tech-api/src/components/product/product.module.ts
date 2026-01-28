@@ -17,5 +17,6 @@ import { CategoryModule } from '../category/category.module';
     CategoryModule,
   ],
   providers: [ProductResolver, ProductService],
+  exports: [ProductService],
 })
 export class ProductModule {}

@@ -214,7 +214,7 @@ export class ProductService {
     const { _id, targetKey, modifier } = input;
     console.log('productStatsEditor executed');
     return await this.productModel
-      .findOneAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
+      .findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
       .exec();
   }
 
