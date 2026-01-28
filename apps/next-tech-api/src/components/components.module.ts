@@ -9,6 +9,7 @@ import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
 import { StoreModule } from './store/store.module';
 import { CategoryModule } from './category/category.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CategoryModule } from './category/category.module';
     OrderModule,
     StoreModule,
     CategoryModule,
+    CommentModule,
   ],
 })
 export class ComponentsModule {}
