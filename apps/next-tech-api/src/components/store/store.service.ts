@@ -57,7 +57,7 @@ export class StoreService {
       },
     };
 
-    const targetStore = await this.storeModel.findOne(search).lean().exec();
+    const targetStore = await this.storeModel.findOne(search).exec();
     if (!targetStore) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
     if (memberId) {
@@ -73,6 +73,13 @@ export class StoreService {
           .exec();
         targetStore.storeViews++;
       }
+
+      const likeInput: LikeInput = {
+        memberId: memberId,
+        likeRefId: storeId,
+        likeGroup: LikeGroup.STORE,
+      };
+      targetStore.meLiked = await this.likeService.checkLikeExistence(likeInput);
     }
 
     return targetStore;

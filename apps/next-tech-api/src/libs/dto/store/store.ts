@@ -2,6 +2,7 @@ import { Member, TotalCounter } from './../member/member';
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { StoreLocation, StoreStatus } from '../../enums/store.enum';
 import type { ObjectId } from 'mongoose';
+import { MeLiked } from '../like/like';
 
 @ObjectType()
 export class Store {
@@ -42,6 +43,9 @@ export class Store {
 
   @Field(() => Member, { nullable: true })
   ownerData?: Member;
+
+  @Field(() => [MeLiked], { nullable: true })
+  meLiked?: MeLiked[];
 }
 
 @ObjectType()
