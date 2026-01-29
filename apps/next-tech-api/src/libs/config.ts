@@ -82,6 +82,26 @@ export const lookupStoreProduct = {
   },
 };
 
+// lookupFollowingData
+export const lookupFollowingData = {
+  $lookup: {
+    from: 'members',
+    localField: 'followingId',
+    foreignField: '_id',
+    as: 'followingData',
+  },
+};
+
+// lookupFollowerData
+export const lookupFollowerData = {
+  $lookup: {
+    from: 'members',
+    localField: 'followerId',
+    foreignField: '_id',
+    as: 'followerData',
+  },
+};
+
 // complexLookupStore
 export const complexLookupStore = {
   $lookup: {
