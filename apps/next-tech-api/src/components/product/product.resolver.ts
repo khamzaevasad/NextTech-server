@@ -16,6 +16,7 @@ import type { ObjectId } from 'mongoose';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { UpdateProductInput, UpdateProductInputAdmin } from '../../libs/dto/product/product.update';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Resolver()
 export class ProductResolver {
@@ -74,6 +75,17 @@ export class ProductResolver {
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Products> {
     return await this.productService.getSellerProducts(memberId, input);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => Product)
+  /* ----------------------------- likeTargetProduct ---------------------------- */
+  public async likeTargetProduct(
+    @Args('productId') input: string,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Product> {
+    const likeRefId = shapeIntoMongoObjectId(input);
+    return await this.productService.likeTargetProduct(memberId, likeRefId);
   }
 
   /* -------------------------------------------------------------------------- */

@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 import { ViewModule } from '../view/view.module';
 import { StoreModule } from '../store/store.module';
 import { CategoryModule } from '../category/category.module';
+import { LikeModule } from '../like/like.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CategoryModule } from '../category/category.module';
     ViewModule,
     StoreModule,
     CategoryModule,
+    LikeModule,
   ],
   providers: [ProductResolver, ProductService],
   exports: [ProductService],

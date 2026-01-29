@@ -1,3 +1,4 @@
+import { LikeService } from './../like/like.service';
 import {
   BadRequestException,
   ForbiddenException,
@@ -26,6 +27,8 @@ import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
 import { UpdateProductInput, UpdateProductInputAdmin } from '../../libs/dto/product/product.update';
 import { complexLookupStore, lookupStoreProduct, shapeIntoMongoObjectId } from '../../libs/config';
+import { LikeInput } from '../../libs/dto/like/like.input';
+import { LikeGroup } from '../../libs/enums/like.enum';
 
 @Injectable()
 export class ProductService {
@@ -34,6 +37,7 @@ export class ProductService {
     private readonly storeService: StoreService,
     private readonly categoryService: CategoryService,
     private readonly viewService: ViewService,
+    private readonly likeService: LikeService,
   ) {}
 
   /* ------------------------------ createProduct ----------------------------- */
@@ -207,6 +211,35 @@ export class ProductService {
     if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
     return result[0];
+  }
+
+  /* ---------------------------- likeTargetProduct --------------------------- */
+  public async likeTargetProduct(memberId: ObjectId, likeRefId: ObjectId): Promise<Product> {
+    const target: Product | null = await this.productModel
+      .findOne({
+        _id: likeRefId,
+        productStatus: ProductStatus.ACTIVE,
+      })
+      .exec();
+
+    if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    const input: LikeInput = {
+      memberId: memberId,
+      likeRefId: likeRefId,
+      likeGroup: LikeGroup.PRODUCT,
+    };
+
+    const modifier: number = await this.likeService.toggleLike(input);
+    const result = await this.productStatsEditor({
+      _id: likeRefId,
+      targetKey: 'productLikes',
+      modifier: modifier,
+    });
+
+    if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+
+    return result;
   }
 
   /* --------------------------- productStatsEditor --------------------------- */
