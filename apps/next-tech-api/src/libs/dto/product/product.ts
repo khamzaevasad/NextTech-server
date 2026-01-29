@@ -4,6 +4,7 @@ import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { GraphQLJSON } from 'graphql-scalars';
 import { Store } from '../store/store';
 import { TotalCounter } from '../member/member';
+import { MeLiked } from '../like/like';
 
 @ObjectType()
 export class Product {
@@ -64,6 +65,9 @@ export class Product {
   /* ---------------------------- FROM AGGREGATION ---------------------------- */
   @Field(() => Store, { nullable: true })
   storeData?: Store;
+
+  @Field(() => [MeLiked], { nullable: true })
+  meLiked?: MeLiked[];
 }
 
 @ObjectType()

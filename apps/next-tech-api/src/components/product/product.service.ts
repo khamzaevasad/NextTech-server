@@ -79,13 +79,13 @@ export class ProductService {
   }
 
   /* ------------------------------- getProduct ------------------------------- */
-  public async getProduct(memberId: ObjectId, productId: ObjectId): Promise<Product | null> {
+  public async getProduct(memberId: ObjectId, productId: ObjectId): Promise<Product> {
     const search: T = {
       _id: productId,
       productStatus: ProductStatus.ACTIVE,
     };
 
-    const targetProduct: Product | null = await this.productModel.findOne(search).lean().exec();
+    const targetProduct: Product | null = await this.productModel.findOne(search).exec();
 
     if (!targetProduct) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
@@ -101,8 +101,12 @@ export class ProductService {
         await this.productStatsEditor({ _id: productId, targetKey: 'productViews', modifier: 1 });
         targetProduct.productViews = (targetProduct.productViews ?? 0) + 1;
       }
-
-      // meLiked
+      const likeInput: LikeInput = {
+        memberId: memberId,
+        likeRefId: productId,
+        likeGroup: LikeGroup.PRODUCT,
+      };
+      targetProduct.meLiked = await this.likeService.checkLikeExistence(likeInput);
     }
 
     targetProduct.storeData = await this.storeService.getStore(null, targetProduct.storeId);
