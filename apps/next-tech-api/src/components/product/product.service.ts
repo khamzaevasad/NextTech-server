@@ -12,6 +12,7 @@ import { Product, Products } from '../../libs/dto/product/product';
 import {
   AllProductsInquiry,
   CreateProductInput,
+  OrdinaryInquiry,
   ProductsInquiry,
   SellerProductInquiry,
 } from '../../libs/dto/product/product.input';
@@ -149,6 +150,7 @@ export class ProductService {
 
     return result;
   }
+
   /* ------------------------------- getProducts ------------------------------ */
   public async getProducts(memberId: ObjectId, input: ProductsInquiry): Promise<Products> {
     const match: T = { productStatus: ProductStatus.ACTIVE };
@@ -178,6 +180,11 @@ export class ProductService {
     if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
     return result[0];
+  }
+
+  /* ------------------------------ getFavorites ------------------------------ */
+  public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Products> {
+    return await this.likeService.getFavoriteProducts(memberId, input);
   }
 
   /* ---------------------------- getSellerProducts --------------------------- */

@@ -205,3 +205,12 @@ export const lookupAuthMemberFollowed = (input: LookupAuthMemberFollowed) => {
     },
   };
 };
+
+export const lookupFavorite = {
+  $lookup: {
+    from: 'stores',
+    localField: 'favoriteProduct.storeId',
+    foreignField: '_id',
+    as: 'favoriteProduct.storeData',
+  },
+};

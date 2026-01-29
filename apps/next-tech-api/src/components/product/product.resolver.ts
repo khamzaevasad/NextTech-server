@@ -7,6 +7,7 @@ import { Product, Products } from '../../libs/dto/product/product';
 import {
   AllProductsInquiry,
   CreateProductInput,
+  OrdinaryInquiry,
   ProductsInquiry,
   SellerProductInquiry,
 } from '../../libs/dto/product/product.input';
@@ -64,6 +65,16 @@ export class ProductResolver {
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Products> {
     return await this.productService.getProducts(memberId, input);
+  }
+
+  @UseGuards(WithoutGuard)
+  @Query(() => Products)
+  /* ------------------------------- getFavorites ------------------------------ */
+  public async getFavorites(
+    @Args('input') input: OrdinaryInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Products> {
+    return await this.productService.getFavorites(memberId, input);
   }
 
   @UseGuards(RolesGuard)
