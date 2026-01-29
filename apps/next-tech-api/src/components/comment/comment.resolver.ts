@@ -28,7 +28,7 @@ export class CommentResolver {
   }
 
   @UseGuards(AuthGuard)
-  @Mutation((returns) => Comment)
+  @Mutation(() => Comment)
   /* ------------------------------ updateComment ----------------------------- */
   public async updateComment(
     @Args('input') input: CommentUpdate,
