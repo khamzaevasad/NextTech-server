@@ -1,26 +1,6 @@
 import { Schema } from 'mongoose';
 import { OrderStatus } from '../libs/enums/order.enum';
 
-const OrderItemSchema = new Schema(
-  {
-    productId: {
-      type: Schema.Types.ObjectId,
-      ref: 'Product',
-      required: true,
-    },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1,
-    },
-    itemPrice: {
-      type: Number,
-      required: true,
-    },
-  },
-  { _id: false },
-);
-
 const OrderSchema = new Schema(
   {
     orderTotal: {
@@ -36,7 +16,6 @@ const OrderSchema = new Schema(
       phone: { type: String, required: true },
       address: { type: String, required: true },
     },
-    items: [OrderItemSchema],
     orderStatus: {
       type: String,
       enum: OrderStatus,
