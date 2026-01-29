@@ -10,7 +10,7 @@ import { StoreStatus } from '../../libs/enums/store.enum';
 import { ViewService } from '../view/view.service';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
-import { lookupMember } from '../../libs/config';
+import { lookupAuthMemberLiked, lookupMember } from '../../libs/config';
 import { StoreUpdate, StoreUpdateAdmin } from '../../libs/dto/store/store.update';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
@@ -100,7 +100,7 @@ export class StoreService {
             list: [
               { $skip: (input.page - 1) * input.limit },
               { $limit: input.limit },
-              // meLiked
+              lookupAuthMemberLiked(memberId),
               lookupMember,
               { $unwind: '$ownerData' },
             ],
