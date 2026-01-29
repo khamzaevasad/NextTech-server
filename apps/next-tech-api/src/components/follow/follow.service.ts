@@ -6,7 +6,7 @@ import { MemberService } from '../member/member.service';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { FollowInquiry } from '../../libs/dto/follow/follow.input';
 import { T } from '../../libs/types/common';
-import { lookupFollowingData } from '../../libs/config';
+import { lookupFollowerData, lookupFollowingData } from '../../libs/config';
 
 @Injectable()
 export class FollowService {
@@ -77,7 +77,7 @@ export class FollowService {
     return result;
   }
 
-  //   getMemberFollowings
+  /* --------------------------- getMemberFollowings -------------------------- */
   public async getMemberFollowings(memberId: ObjectId, input: FollowInquiry): Promise<Followings> {
     const { page, limit, search } = input;
     if (!search.followerId) throw new InternalServerErrorException(Message.BAD_REQUEST);
@@ -97,6 +97,39 @@ export class FollowService {
               //   lookupAuthMemberFollowed({ followerId: memberId, followingId: '$followingId' }),
               lookupFollowingData,
               { $unwind: '$followingData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    return result[0];
+  }
+
+  /* --------------------------- getMemberFollowers --------------------------- */
+  public async getMemberFollowers(memberId: ObjectId, input: FollowInquiry): Promise<Followers> {
+    const { page, limit, search } = input;
+    if (!search.followingId) throw new InternalServerErrorException(Message.BAD_REQUEST);
+
+    const match: T = { followingId: search?.followingId };
+    console.log('match', match);
+
+    const result = await this.followModel
+      .aggregate([
+        { $match: match },
+        { $sort: { createdAt: Direction.DESC } },
+        {
+          $facet: {
+            list: [
+              { $skip: (page - 1) * limit },
+              { $limit: limit },
+              //   lookupAuthMemberLiked(memberId, '$followerId'),
+              //   lookupAuthMemberFollowed({ followerId: memberId, followingId: '$followerId' }),
+              lookupFollowerData,
+              { $unwind: '$followerData' },
             ],
             metaCounter: [{ $count: 'total' }],
           },
