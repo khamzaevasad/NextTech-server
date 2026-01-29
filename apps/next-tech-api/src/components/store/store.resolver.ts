@@ -11,6 +11,7 @@ import { StoreInput, StoresInquiry } from '../../libs/dto/store/store.input';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { StoreUpdate, StoreUpdateAdmin } from '../../libs/dto/store/store.update';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Resolver()
 export class StoreResolver {
@@ -59,6 +60,17 @@ export class StoreResolver {
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Stores> {
     return await this.storeService.getStores(memberId, input);
+  }
+
+  @UseGuards(AuthGuard)
+  @Mutation(() => Store)
+  /* ----------------------------- likeTargetStore ---------------------------- */
+  public async likeTargetStore(
+    @Args('storeId') input: string,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Store> {
+    const likeRefId = shapeIntoMongoObjectId(input);
+    return await this.storeService.likeTargetStore(memberId, likeRefId);
   }
 
   /* -------------------------------------------------------------------------- */

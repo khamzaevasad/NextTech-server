@@ -5,12 +5,14 @@ import { MongooseModule } from '@nestjs/mongoose';
 import StoreSchema from '../../schemas/Store.model';
 import { ViewModule } from '../view/view.module';
 import { AuthModule } from '../auth/auth.module';
+import { LikeModule } from '../like/like.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Store', schema: StoreSchema }]),
     AuthModule,
     ViewModule,
+    LikeModule,
   ],
   providers: [StoreService, StoreResolver],
   exports: [StoreService],

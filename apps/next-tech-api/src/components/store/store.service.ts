@@ -12,12 +12,16 @@ import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { lookupMember } from '../../libs/config';
 import { StoreUpdate, StoreUpdateAdmin } from '../../libs/dto/store/store.update';
+import { LikeInput } from '../../libs/dto/like/like.input';
+import { LikeGroup } from '../../libs/enums/like.enum';
+import { LikeService } from '../like/like.service';
 
 @Injectable()
 export class StoreService {
   constructor(
     @InjectModel('Store') private readonly storeModel: Model<Store>,
     private readonly viewService: ViewService,
+    private readonly likeService: LikeService,
   ) {}
 
   /* ------------------------------- createStore ------------------------------ */
@@ -109,6 +113,37 @@ export class StoreService {
       .exec();
 
     if (!result) throw new NotFoundException(Message.NO_STORE);
+    return result;
+  }
+
+  /* ----------------------------- likeTargetStore ---------------------------- */
+  public async likeTargetStore(memberId: ObjectId, likeRefId: ObjectId): Promise<Store> {
+    const target: Store | null = await this.storeModel
+      .findOne({
+        _id: likeRefId,
+        storeStatus: StoreStatus.ACTIVE,
+      })
+      .exec();
+
+    if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    const input: LikeInput = {
+      memberId: memberId,
+      likeRefId: likeRefId,
+      likeGroup: LikeGroup.STORE,
+    };
+
+    // LIKE TOGGLE
+
+    const modifier: number = await this.likeService.toggleLike(input);
+    const result = await this.storeStatsEditor({
+      _id: likeRefId,
+      targetKey: 'storeLikes',
+      modifier: modifier,
+    });
+
+    if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+
     return result;
   }
 
