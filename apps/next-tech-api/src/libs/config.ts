@@ -1,6 +1,7 @@
 import { ObjectId } from 'bson';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
+import { T } from './types/common';
 
 /* -------------------------------------------------------------------------- */
 /*                                  FOR SORTS                                 */
@@ -122,4 +123,42 @@ export const complexLookupStore = {
     ],
     as: 'storeData',
   },
+};
+
+// lookupAuthMemberLiked
+export const lookupAuthMemberLiked = (memberId: T, targetRefId: string = '$_id') => {
+  return {
+    $lookup: {
+      from: 'likes',
+      let: {
+        localLikeRefId: targetRefId,
+        localMemberId: memberId,
+        localMyFavorite: true,
+      },
+      pipeline: [
+        // match
+        {
+          $match: {
+            $expr: {
+              $and: [
+                { $eq: ['$likeRefId', '$$localLikeRefId'] }, //true
+                { $eq: ['$memberId', '$$localMemberId'] }, //true
+              ],
+            },
+          },
+        },
+        // projection
+        {
+          $project: {
+            _id: 0,
+            memberId: 1,
+            likeRefId: 1,
+            myFavorite: '$$localMyFavorite',
+          },
+        },
+      ],
+      // result Name
+      as: 'meLiked',
+    },
+  };
 };

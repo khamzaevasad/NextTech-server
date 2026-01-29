@@ -26,7 +26,12 @@ import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
 import { UpdateProductInput, UpdateProductInputAdmin } from '../../libs/dto/product/product.update';
-import { complexLookupStore, lookupStoreProduct, shapeIntoMongoObjectId } from '../../libs/config';
+import {
+  complexLookupStore,
+  lookupAuthMemberLiked,
+  lookupStoreProduct,
+  shapeIntoMongoObjectId,
+} from '../../libs/config';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 
@@ -160,7 +165,7 @@ export class ProductService {
             list: [
               { $skip: (input.page - 1) * input.limit },
               { $limit: input.limit },
-              // TODO: meliked logic
+              lookupAuthMemberLiked(memberId),
               lookupStoreProduct,
               { $unwind: '$storeData' },
             ],

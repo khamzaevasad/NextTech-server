@@ -87,7 +87,7 @@ export class MemberResolver {
   @UseGuards(RolesGuard)
   @Roles(MemberType.ADMIN)
   @Query(() => Members)
-  /* ------------------------- // getAllMembersByAdmin ------------------------ */
+  /* -------------------------  getAllMembersByAdmin ------------------------ */
   public async getAllMembersByAdmin(@Args('input') input: MembersInquiry): Promise<Members> {
     return await this.memberService.getAllMembersByAdmin(input);
   }
@@ -95,7 +95,7 @@ export class MemberResolver {
   @UseGuards(RolesGuard)
   @Roles(MemberType.ADMIN)
   @Mutation(() => Member)
-  /* ------------------------- // updateMemberByAdmin ------------------------- */
+  /* -------------------------  updateMemberByAdmin ------------------------- */
   public async updateMemberByAdmin(@Args('input') input: MemberUpdate): Promise<Member> {
     return await this.memberService.updateMemberByAdmin(input);
   }
@@ -105,7 +105,7 @@ export class MemberResolver {
   /* -------------------------------------------------------------------------- */
 
   @UseGuards(AuthGuard)
-  @Mutation((returns) => String)
+  @Mutation(() => String)
   public async imageUploader(
     @Args({ name: 'file', type: () => GraphQLUpload })
     { createReadStream, filename, mimetype }: FileUpload,
