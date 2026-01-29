@@ -15,11 +15,13 @@ import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ViewService } from '../view/view.service';
 import { lookupStore } from '../../libs/config';
+import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
 
 @Injectable()
 export class MemberService {
   constructor(
     @InjectModel('Member') private readonly memberModel: Model<Member>,
+    @InjectModel('Follow') private readonly followModel: Model<Follower | Following>,
     private readonly authService: AuthService,
     private readonly viewService: ViewService,
   ) {}
@@ -76,7 +78,7 @@ export class MemberService {
   }
 
   /* ------------------------------  getMember ------------------------------ */
-  public async getMember(memberId: ObjectId | null, targetId: ObjectId | null): Promise<Member> {
+  public async getMember(memberId: ObjectId | null, targetId: ObjectId): Promise<Member> {
     const search: T = {
       _id: targetId,
       memberStatus: {
@@ -84,10 +86,24 @@ export class MemberService {
       },
     };
 
-    const targetMember = await this.memberModel.findOne(search).exec();
+    let targetMember = await this.memberModel.findOne(search).exec();
     if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-
+    targetMember.meFollowed = memberId ? await this.checkSubscription(memberId, targetId) : [];
     return targetMember;
+  }
+  /* ---------------------------- PRIVATE checkSubscription --------------------------- */
+  private async checkSubscription(
+    followerId: ObjectId,
+    followingId: ObjectId,
+  ): Promise<MeFollowed[]> {
+    const result = await this.followModel
+      .findOne({
+        followingId: followingId,
+        followerId: followerId,
+      })
+      .exec();
+
+    return result ? [{ followerId: followerId, followingId: followingId, myFollowing: true }] : [];
   }
 
   /* ------------------------------  getSeller ------------------------------ */
