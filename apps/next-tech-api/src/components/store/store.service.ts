@@ -15,6 +15,7 @@ import { StoreUpdate, StoreUpdateAdmin } from '../../libs/dto/store/store.update
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
+import { OrdinaryInquiry } from '../../libs/dto/product/product.input';
 
 @Injectable()
 export class StoreService {
@@ -112,6 +113,11 @@ export class StoreService {
 
     if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     return result[0];
+  }
+
+  /* ------------------------------- getVisited ------------------------------- */
+  public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Stores> {
+    return await this.viewService.getVisitStore(memberId, input);
   }
 
   /* -------------------------------- findStore ------------------------------- */

@@ -12,6 +12,7 @@ import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { StoreUpdate, StoreUpdateAdmin } from '../../libs/dto/store/store.update';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { OrdinaryInquiry } from '../../libs/dto/product/product.input';
 
 @Resolver()
 export class StoreResolver {
@@ -60,6 +61,16 @@ export class StoreResolver {
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Stores> {
     return await this.storeService.getStores(memberId, input);
+  }
+
+  @UseGuards(WithoutGuard)
+  @Query(() => Stores)
+  /* ------------------------------- getVisited ------------------------------ */
+  public async getVisited(
+    @Args('input') input: OrdinaryInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Stores> {
+    return await this.storeService.getVisited(memberId, input);
   }
 
   @UseGuards(AuthGuard)
