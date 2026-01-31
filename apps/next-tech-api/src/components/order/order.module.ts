@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 import { MemberModule } from '../member/member.module';
 import { ProductModule } from '../product/product.module';
 import OrderItemSchema from '../../schemas/OrderItem.model';
+import { StoreModule } from '../store/store.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import OrderItemSchema from '../../schemas/OrderItem.model';
     AuthModule,
     MemberModule,
     ProductModule,
+    StoreModule,
   ],
   providers: [OrderResolver, OrderService],
   exports: [OrderService],

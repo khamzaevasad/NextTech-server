@@ -2,6 +2,7 @@ import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsNotEmpty, IsOptional, Min, ValidateNested } from 'class-validator';
 import type { ObjectId } from 'mongoose';
 import { Type } from 'class-transformer';
+import { OrderStatus } from '../../enums/order.enum';
 
 @InputType()
 export class DeliveryAddressInput {
@@ -43,4 +44,15 @@ export class CreateOrderInput {
   @Type(() => DeliveryAddressInput)
   @Field(() => DeliveryAddressInput)
   deliveryAddress: DeliveryAddressInput;
+}
+
+@InputType()
+export class OrderUpdateInput {
+  @IsNotEmpty()
+  @Field(() => String)
+  orderId: ObjectId;
+
+  @IsNotEmpty()
+  @Field(() => OrderStatus)
+  orderStatus: OrderStatus;
 }
