@@ -206,6 +206,7 @@ export const lookupAuthMemberFollowed = (input: LookupAuthMemberFollowed) => {
   };
 };
 
+// lookupFavorite
 export const lookupFavorite = {
   $lookup: {
     from: 'stores',
@@ -215,11 +216,32 @@ export const lookupFavorite = {
   },
 };
 
+// lookupVisit
 export const lookupVisit = {
   $lookup: {
     from: 'members',
     localField: 'visitedStore.ownerId',
     foreignField: '_id',
     as: 'visitedProduct.ownerData',
+  },
+};
+
+// lookupOrderItems
+export const lookupOrderItems = {
+  $lookup: {
+    from: 'orderItems',
+    localField: '_id',
+    foreignField: 'orderId',
+    as: 'orderItems',
+  },
+};
+
+// lookupOrderProduct
+export const lookupOrderProduct = {
+  $lookup: {
+    from: 'products',
+    localField: 'orderItems.productId',
+    foreignField: '_id',
+    as: 'productData',
   },
 };

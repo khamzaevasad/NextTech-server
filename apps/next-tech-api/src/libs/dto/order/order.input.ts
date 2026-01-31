@@ -1,8 +1,10 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional, Min, ValidateNested } from 'class-validator';
+import { IsIn, IsNotEmpty, IsOptional, Min, ValidateNested } from 'class-validator';
 import type { ObjectId } from 'mongoose';
 import { Type } from 'class-transformer';
 import { OrderStatus } from '../../enums/order.enum';
+import { sorts } from '../../config';
+import { Direction } from '../../enums/common.enum';
 
 @InputType()
 export class DeliveryAddressInput {
@@ -46,13 +48,39 @@ export class CreateOrderInput {
   deliveryAddress: DeliveryAddressInput;
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                OrdersInquiry                               */
+/* -------------------------------------------------------------------------- */
+
 @InputType()
-export class OrderUpdateInput {
+export class SearchOrder {
+  @IsOptional()
+  @Field(() => OrderStatus, { nullable: true })
+  orderStatus?: OrderStatus;
+}
+
+@InputType()
+export class OrdersInquiry {
   @IsNotEmpty()
-  @Field(() => String)
-  orderId: ObjectId;
+  @Min(1)
+  @Field(() => Int)
+  page: number;
 
   @IsNotEmpty()
-  @Field(() => OrderStatus)
-  orderStatus: OrderStatus;
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(sorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: string;
+
+  @IsNotEmpty()
+  @Field(() => SearchOrder)
+  search: SearchOrder;
 }

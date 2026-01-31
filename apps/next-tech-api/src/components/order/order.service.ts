@@ -1,18 +1,16 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
-import { Order, OrderItem } from '../../libs/dto/order/order';
-import {
-  CreateOrderInput,
-  OrderItemInput,
-  OrderUpdateInput,
-} from '../../libs/dto/order/order.input';
-import { Message } from '../../libs/enums/common.enum';
+import { Order, OrderItem, Orders } from '../../libs/dto/order/order';
+import { CreateOrderInput, OrderItemInput, OrdersInquiry } from '../../libs/dto/order/order.input';
+import { Direction, Message } from '../../libs/enums/common.enum';
 import { ProductService } from '../product/product.service';
-import { shapeIntoMongoObjectId } from '../../libs/config';
+import { lookupOrderItems, lookupOrderProduct, shapeIntoMongoObjectId } from '../../libs/config';
 import { OrderStatus } from '../../libs/enums/order.enum';
 import { StoreService } from '../store/store.service';
 import { MemberService } from '../member/member.service';
+import { OrderUpdateInput } from '../../libs/dto/order/order.update';
+import { T } from '../../libs/types/common';
 @Injectable()
 export class OrderService {
   constructor(
@@ -159,5 +157,31 @@ export class OrderService {
     if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
     return result;
+  }
+
+  /* ------------------------------- getMyOrders ------------------------------ */
+  public async getMyOrders(memberId: ObjectId, input: OrdersInquiry): Promise<Orders> {
+    const match: T = {};
+    const sort: T = { [input?.sort ?? 'createdAt']: input.direction ?? Direction.DESC };
+    if (input.search.orderStatus) match.orderStatus = input.search.orderStatus;
+    const result = await this.orderModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupOrderItems,
+              lookupOrderProduct,
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result[0];
   }
 }
