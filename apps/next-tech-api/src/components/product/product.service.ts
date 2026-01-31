@@ -85,7 +85,7 @@ export class ProductService {
   }
 
   /* ------------------------------- getProduct ------------------------------- */
-  public async getProduct(memberId: ObjectId, productId: ObjectId): Promise<Product> {
+  public async getProduct(memberId: ObjectId | null, productId: ObjectId): Promise<Product> {
     const search: T = {
       _id: productId,
       productStatus: ProductStatus.ACTIVE,
