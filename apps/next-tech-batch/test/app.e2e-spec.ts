@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { NextTechBatchModule } from './../src/next-tech-batch.module';
+import { NextTechBatchModule } from '../src/batch.module';
 
 describe('NextTechBatchController (e2e)', () => {
   let app: INestApplication;
@@ -16,9 +16,6 @@ describe('NextTechBatchController (e2e)', () => {
   });
 
   it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+    return request(app.getHttpServer()).get('/').expect(200).expect('Hello World!');
   });
 });
