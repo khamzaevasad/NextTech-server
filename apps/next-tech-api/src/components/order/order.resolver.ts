@@ -38,7 +38,7 @@ export class OrderResolver {
   public async getMyOrders(
     @Args('input') input: OrdersInquiry,
     @AuthMember('_id') memberId: ObjectId,
-  ) {
+  ): Promise<Orders> {
     return await this.orderService.getMyOrders(memberId, input);
   }
 }

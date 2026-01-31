@@ -9,6 +9,7 @@ import { ComponentsModule } from './components/components.module';
 import { DatabaseModule } from './database/database.module';
 import { T } from './libs/types/common';
 import { GraphQLJSON } from 'graphql-scalars';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { GraphQLJSON } from 'graphql-scalars';
     }),
     ComponentsModule,
     DatabaseModule,
+    SocketModule,
   ],
   controllers: [AppController],
   providers: [
