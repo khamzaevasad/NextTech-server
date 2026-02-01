@@ -1,7 +1,7 @@
 import { Controller, Get, Logger } from '@nestjs/common';
 import { BatchService } from './batch.service';
 import { Cron } from '@nestjs/schedule';
-import { BATCH_ROLLBACK, BATCH_TOP_PRODUCTS, BATCH_TOP_STORES } from './lib/config';
+import { BATCH_ROLLBACK, BATCH_TOP_SELLERS, BATCH_TOP_STORES } from './lib/config';
 
 @Controller()
 export class BatchController {
@@ -14,7 +14,7 @@ export class BatchController {
   }
 
   /* ------------------------------ batchRollback ----------------------------- */
-  @Cron('00 * * * * *', { name: BATCH_ROLLBACK })
+  @Cron('00 00 01 * * *', { name: BATCH_ROLLBACK })
   public async batchRollback() {
     try {
       this.logger['context'] = BATCH_ROLLBACK;
@@ -26,19 +26,19 @@ export class BatchController {
   }
 
   /* ---------------------------- batchTopProducts ---------------------------- */
-  @Cron('20 * * * * *', { name: BATCH_TOP_PRODUCTS })
-  public async batchTopProducts() {
+  @Cron('20 00 01  * * *', { name: BATCH_TOP_SELLERS })
+  public async batchTopSellers() {
     try {
-      this.logger['context'] = BATCH_TOP_PRODUCTS;
+      this.logger['context'] = BATCH_TOP_SELLERS;
       this.logger.debug('EXECUTED');
-      await this.batchService.batchTopProducts();
+      await this.batchService.batchTopSellers();
     } catch (err) {
       this.logger.error(err);
     }
   }
 
   /* ----------------------------- batchTopStores ----------------------------- */
-  @Cron('40 * * * * *', { name: BATCH_TOP_STORES })
+  @Cron('40 00 01 * * *', { name: BATCH_TOP_STORES })
   public async batchTopStores() {
     try {
       this.logger['context'] = BATCH_TOP_STORES;
