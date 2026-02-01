@@ -27,7 +27,7 @@ export class BatchService {
       .exec();
   }
 
-  /* ---------------------------- batchTopProducts ---------------------------- */
+  /* ---------------------------- batchTopSellers ---------------------------- */
   public async batchTopSellers() {
     const sellers: Member[] = await this.memberModel
       .find({

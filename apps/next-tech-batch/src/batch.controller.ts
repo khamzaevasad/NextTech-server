@@ -25,7 +25,7 @@ export class BatchController {
     }
   }
 
-  /* ---------------------------- batchTopProducts ---------------------------- */
+  /* ---------------------------- batchTopSellers ---------------------------- */
   @Cron('20 00 01  * * *', { name: BATCH_TOP_SELLERS })
   public async batchTopSellers() {
     try {
