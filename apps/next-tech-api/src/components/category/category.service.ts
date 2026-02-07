@@ -7,6 +7,7 @@ import { Direction, Message } from '../../libs/enums/common.enum';
 import { T } from '../../libs/types/common';
 import { UpdateCategoryInput } from '../../libs/dto/category/category.update';
 import { generateSlug } from '../../libs/utils/slug.util';
+import { shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class CategoryService {
@@ -14,10 +15,13 @@ export class CategoryService {
 
   /* ------------------------------ getCategories ----------------------------- */
   public async getCategories(input: CategoriesInquiry): Promise<Categories> {
-    const { text } = input.search;
+    const { text, parentId } = input.search;
     const match: T = {};
     const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
     if (text) match.categoryName = { $regex: new RegExp(text, 'i') };
+    if (parentId !== undefined) {
+      match.parentId = parentId === null ? null : shapeIntoMongoObjectId(parentId);
+    }
 
     const result = await this.categoryModel
       .aggregate([

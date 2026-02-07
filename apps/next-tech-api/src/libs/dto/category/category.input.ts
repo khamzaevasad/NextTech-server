@@ -27,6 +27,10 @@ class SearchCategory {
   @IsOptional()
   @Field(() => String, { nullable: true })
   text?: string;
+
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  parentId?: ObjectId | null;
 }
 
 @InputType()
