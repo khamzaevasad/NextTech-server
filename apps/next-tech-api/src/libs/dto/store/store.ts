@@ -30,6 +30,9 @@ export class Store {
   @Field(() => Int)
   storeRating: number;
 
+  @Field(() => String)
+  storeLogo: string;
+
   @Field(() => Int)
   storeComments: number;
 
