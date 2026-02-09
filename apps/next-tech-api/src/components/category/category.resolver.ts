@@ -4,7 +4,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { MemberType } from '../../libs/enums/member.enum';
 import { UseGuards } from '@nestjs/common';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Categories, Category } from '../../libs/dto/category/category';
+import { Categories, Category, FilterOptions } from '../../libs/dto/category/category';
 import { CategoriesInquiry, CreateCategoryInput } from '../../libs/dto/category/category.input';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { UpdateCategoryInput } from '../../libs/dto/category/category.update';
@@ -12,6 +12,13 @@ import { UpdateCategoryInput } from '../../libs/dto/category/category.update';
 @Resolver()
 export class CategoryResolver {
   constructor(private readonly categoryService: CategoryService) {}
+
+  @Query(() => FilterOptions)
+  /* ------------------------- getFilterOptions ------------------------- */
+  public async getFilterOptions(@Args('categoryId') categoryId: string): Promise<FilterOptions> {
+    const id = shapeIntoMongoObjectId(categoryId);
+    return await this.categoryService.getAvailableFilterOptions(id);
+  }
 
   @Query(() => Categories)
   /* ------------------------------ getCategories ----------------------------- */

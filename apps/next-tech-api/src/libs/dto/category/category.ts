@@ -1,6 +1,7 @@
 import { Field, ObjectType, ID } from '@nestjs/graphql';
 import type { ObjectId } from 'mongoose';
 import { TotalCounter } from '../member/member';
+import { GraphQLJSON } from 'graphql-scalars';
 
 @ObjectType()
 export class Category {
@@ -42,4 +43,16 @@ export class Categories {
 
   @Field(() => [TotalCounter], { nullable: true })
   metaCounter?: TotalCounter[];
+}
+
+@ObjectType()
+export class FilterOptions {
+  @Field(() => [String])
+  brands: string[];
+
+  @Field(() => GraphQLJSON)
+  specOptions: Record<string, string[]>;
+
+  @Field(() => [String])
+  filterKeys: string[];
 }
