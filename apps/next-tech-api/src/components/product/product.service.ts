@@ -85,9 +85,9 @@ export class ProductService {
   }
 
   /* ------------------------------- getProduct ------------------------------- */
-  public async getProduct(memberId: ObjectId | null, productId: ObjectId): Promise<Product> {
+  public async getProduct(memberId: ObjectId | null, productSlug: string): Promise<Product> {
     const search: T = {
-      _id: productId,
+      productSlug: productSlug,
       productStatus: ProductStatus.ACTIVE,
     };
 
@@ -98,18 +98,22 @@ export class ProductService {
     if (memberId) {
       const viewInput: ViewInput = {
         memberId: memberId,
-        viewRefId: productId,
+        viewRefId: targetProduct._id,
         viewGroup: ViewGroup.PRODUCT,
       };
       const newView = await this.viewService.recordView(viewInput);
 
       if (newView) {
-        await this.productStatsEditor({ _id: productId, targetKey: 'productViews', modifier: 1 });
+        await this.productStatsEditor({
+          _id: targetProduct._id,
+          targetKey: 'productViews',
+          modifier: 1,
+        });
         targetProduct.productViews = (targetProduct.productViews ?? 0) + 1;
       }
       const likeInput: LikeInput = {
         memberId: memberId,
-        likeRefId: productId,
+        likeRefId: targetProduct._id,
         likeGroup: LikeGroup.PRODUCT,
       };
       targetProduct.meLiked = await this.likeService.checkLikeExistence(likeInput);

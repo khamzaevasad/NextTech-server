@@ -41,8 +41,8 @@ export class ProductResolver {
     @Args('input') input: string,
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Product | null> {
-    const productId = shapeIntoMongoObjectId(input);
-    return await this.productService.getProduct(memberId, productId);
+    // const productId = shapeIntoMongoObjectId(input);
+    return await this.productService.getProduct(memberId, input);
   }
 
   @UseGuards(RolesGuard)
