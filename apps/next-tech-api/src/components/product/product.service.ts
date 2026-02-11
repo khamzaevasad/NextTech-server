@@ -186,6 +186,14 @@ export class ProductService {
     return result[0];
   }
 
+  public async findProduct(productId: ObjectId): Promise<Product> {
+    const result: Product | null = await this.productModel.findById({ _id: productId }).exec();
+
+    if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+    return result;
+  }
+
   /* ------------------------------ getFavorites ------------------------------ */
   public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Products> {
     return await this.likeService.getFavoriteProducts(memberId, input);

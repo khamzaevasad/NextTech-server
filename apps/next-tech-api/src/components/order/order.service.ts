@@ -37,7 +37,7 @@ export class OrderService {
       }> = [];
 
       for (const item of input.orderItems) {
-        const product = await this.productService.getProduct(null, item.productId);
+        const product = await this.productService.findProduct(item.productId);
 
         // check stock
         if (product.productStock < item.itemQuantity) {
@@ -96,7 +96,7 @@ export class OrderService {
     }> = [];
 
     for (const item of items) {
-      const product = await this.productService.getProduct(null, item.productId);
+      const product = await this.productService.findProduct(item.productId);
 
       docs.push({
         orderId,
@@ -121,7 +121,7 @@ export class OrderService {
       const storeCounterMap = new Map<ObjectId, number>();
 
       for (const item of items) {
-        const product = await this.productService.getProduct(null, item.productId);
+        const product = await this.productService.findProduct(item.productId);
 
         await this.productService.productStatsEditor({
           _id: item.productId,
