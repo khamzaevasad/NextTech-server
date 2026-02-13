@@ -21,6 +21,7 @@ export enum Message {
   SELF_SUBSCRIPTION_DENIED = 'Self subscription is denied!',
   NO_STORE = 'Please create a store first!',
   RATTING_REQUIRED = 'Rating is required for product reviews',
+  NO_PERMISSION = 'No permission to delete this comment',
 }
 
 export enum Direction {

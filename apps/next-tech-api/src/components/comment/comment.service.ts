@@ -4,6 +4,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -83,22 +84,40 @@ export class CommentService {
 
   /* ------------------------------ updateComment ----------------------------- */
   public async updateComment(memberId: ObjectId, input: CommentUpdate): Promise<Comment> {
-    const { _id } = input;
+    const { _id, rating: newRating, commentContent } = input;
 
-    const result = await this.commentModel
-      .findOneAndUpdate(
-        {
-          _id: _id,
-          memberId: memberId,
-          commentStatus: CommentStatus.ACTIVE,
-        },
-        input,
-        { new: true },
-      )
-      .exec();
+    const comment = await this.commentModel.findOne({
+      _id,
+      memberId,
+      commentStatus: CommentStatus.ACTIVE,
+    });
 
-    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
-    return result;
+    if (!comment) {
+      throw new InternalServerErrorException(Message.UPDATE_FAILED);
+    }
+
+    if (
+      comment.commentGroup === CommentGroup.PRODUCT &&
+      typeof newRating === 'number' &&
+      newRating !== comment.rating
+    ) {
+      const diff = newRating - (comment.rating ?? 0);
+
+      await this.productService.productStatsEditor({
+        _id: comment.commentRefId,
+        targetKey: 'productRating',
+        modifier: diff,
+      });
+
+      comment.rating = newRating;
+    }
+
+    if (commentContent) {
+      comment.commentContent = commentContent;
+    }
+
+    await comment.save();
+    return comment;
   }
 
   /* ------------------------------- getComments ------------------------------ */

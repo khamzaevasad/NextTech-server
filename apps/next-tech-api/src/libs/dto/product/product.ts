@@ -56,6 +56,12 @@ export class Product {
   @Field(() => Int)
   productComments: number;
 
+  @Field(() => Int)
+  productRating: number;
+
+  @Field(() => Int)
+  productRatingCount: number;
+
   @Field(() => Date)
   createdAt: Date;
 
