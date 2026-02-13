@@ -1,5 +1,10 @@
 import { ProductService } from './../product/product.service';
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BoardArticleService } from '../board-article/board-article.service';
@@ -11,11 +16,15 @@ import { CommentGroup, CommentStatus } from '../../libs/enums/comment.enum';
 import { Comment, Comments } from './../../libs/dto/comment/comment';
 import { CommentUpdate } from '../../libs/dto/comment/comment.update';
 import { T } from '../../libs/types/common';
+import { Order, OrderItem } from '../../libs/dto/order/order';
+import { OrderStatus } from '../../libs/enums/order.enum';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectModel('Comment') private readonly commentModel: Model<Comment>,
+    @InjectModel('Order') private readonly orderModel: Model<Order>,
+    @InjectModel('OrderItem') private readonly orderItemModel: Model<OrderItem>,
     private readonly productService: ProductService,
     private readonly boardArticleService: BoardArticleService,
     private readonly storeService: StoreService,
@@ -25,13 +34,17 @@ export class CommentService {
   public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
     input.memberId = memberId;
 
-    let result: Comment | null = null;
-    try {
-      result = await this.commentModel.create(input);
-    } catch (err) {
-      console.log('CommentService=>createComment Error:', err.message);
-      throw new BadRequestException(Message.CREATE_FAILED);
+    let orderItem: OrderItem | null = null;
+
+    if (input.commentGroup === CommentGroup.PRODUCT) {
+      if (!input.rating) {
+        throw new BadRequestException(Message.RATTING_REQUIRED);
+      }
+
+      orderItem = await this.validateProductReview(memberId, input.commentRefId);
     }
+
+    const comment = await this.commentModel.create(input);
 
     switch (input.commentGroup) {
       case CommentGroup.PRODUCT:
@@ -40,7 +53,14 @@ export class CommentService {
           targetKey: 'productComments',
           modifier: 1,
         });
+
+        await this.productService.updateProductRating(input.commentRefId, input.rating!);
+
+        await this.orderItemModel.findByIdAndUpdate(orderItem!._id, {
+          isReviewed: true,
+        });
         break;
+
       case CommentGroup.ARTICLE:
         await this.boardArticleService.boardArticleStatsEditor({
           _id: input.commentRefId,
@@ -48,6 +68,7 @@ export class CommentService {
           modifier: 1,
         });
         break;
+
       case CommentGroup.STORE:
         await this.storeService.storeStatsEditor({
           _id: input.commentRefId,
@@ -57,10 +78,7 @@ export class CommentService {
         break;
     }
 
-    console.log('cooment result:', result);
-    if (!result) throw new InternalServerErrorException(Message.CREATE_FAILED);
-
-    return result;
+    return comment;
   }
 
   /* ------------------------------ updateComment ----------------------------- */
@@ -121,6 +139,23 @@ export class CommentService {
     return result[0];
   }
 
+  /* -------------------------- Helper validateProductReview ------------------------- */
+  private async validateProductReview(memberId: ObjectId, productId: ObjectId): Promise<OrderItem> {
+    const order = await this.orderModel
+      .findOne({ memberId, orderStatus: OrderStatus.FINISH })
+      .exec();
+
+    if (!order) throw new ForbiddenException(Message.NO_DATA_FOUND);
+
+    const orderItem = await this.orderItemModel.findOne({ orderId: order._id, productId }).exec();
+
+    if (!orderItem) throw new ForbiddenException('You did not purchase this product');
+
+    // @ts-ignore
+    if (orderItem.isReviewed) throw new BadRequestException('Product already reviewed');
+
+    return orderItem;
+  }
   /* -------------------------------------------------------------------------- */
   /*                                  FOR ADMIN                                 */
   /* -------------------------------------------------------------------------- */

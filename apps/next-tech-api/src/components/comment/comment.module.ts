@@ -7,10 +7,14 @@ import { AuthModule } from '../auth/auth.module';
 import { BoardArticleModule } from '../board-article/board-article.module';
 import { ProductModule } from '../product/product.module';
 import { StoreModule } from '../store/store.module';
+import OrderSchema from '../../schemas/Order.model';
+import OrderItemSchema from '../../schemas/OrderItem.model';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: 'Comment', schema: CommentSchema }]),
+    MongooseModule.forFeature([{ name: 'Order', schema: OrderSchema }]),
+    MongooseModule.forFeature([{ name: 'OrderItem', schema: OrderItemSchema }]),
     AuthModule,
     BoardArticleModule,
     ProductModule,

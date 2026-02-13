@@ -279,6 +279,16 @@ export class ProductService {
       .exec();
   }
 
+  /* --------------------------- updateProductRating -------------------------- */
+  public async updateProductRating(productId: ObjectId, rating: number): Promise<void> {
+    await this.productModel.findByIdAndUpdate(productId, {
+      $inc: {
+        productRating: rating,
+        productRatingCount: 1,
+      },
+    });
+  }
+
   /* ------------------------- PRIVATE shapeMatchQuery ------------------------ */
   private shapeMatchQuery(match: T, input: ProductsInquiry): void {
     const { categoryId, storeId, priceRange, specs, text, brands } = input.search;
@@ -344,6 +354,8 @@ export class ProductService {
 
     return slug;
   }
+
+  /* -------------------------- PRIVATE validateProductReview ------------------------- */
 
   /* -------------------------------------------------------------------------- */
   /*                                  FOR ADMIN                                 */

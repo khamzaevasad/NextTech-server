@@ -21,6 +21,11 @@ export class CommentInput {
   commentRefId: ObjectId;
 
   memberId?: ObjectId;
+
+  @IsOptional()
+  @Min(1)
+  @Field(() => Int, { nullable: true })
+  rating?: number;
 }
 
 @InputType()

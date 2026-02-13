@@ -18,6 +18,10 @@ const OrderItemSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Product',
     },
+    isReviewed: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true, collection: 'orderItems' },
 );

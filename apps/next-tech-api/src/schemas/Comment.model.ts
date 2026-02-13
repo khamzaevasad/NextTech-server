@@ -29,6 +29,11 @@ const CommentSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: true,
     },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
   },
   { timestamps: true, collection: 'comments' },
 );

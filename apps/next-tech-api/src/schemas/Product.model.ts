@@ -67,6 +67,15 @@ const ProductSchema = new Schema(
       type: Number,
       default: 0,
     },
+    productRating: {
+      type: Number,
+      default: 0,
+    },
+
+    productRatingCount: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true, collection: 'products' },
 );
