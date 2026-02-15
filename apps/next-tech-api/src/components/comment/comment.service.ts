@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as mongoose from 'mongoose';
 import { BoardArticleService } from '../board-article/board-article.service';
 import { StoreService } from '../store/store.service';
 import type { ObjectId } from 'mongoose';
@@ -19,6 +20,7 @@ import { CommentUpdate } from '../../libs/dto/comment/comment.update';
 import { T } from '../../libs/types/common';
 import { Order, OrderItem } from '../../libs/dto/order/order';
 import { OrderStatus } from '../../libs/enums/order.enum';
+import { shapeIntoMongoObjectId } from '../../libs/config';
 
 @Injectable()
 export class CommentService {
@@ -160,13 +162,19 @@ export class CommentService {
 
   /* -------------------------- Helper validateProductReview ------------------------- */
   private async validateProductReview(memberId: ObjectId, productId: ObjectId): Promise<OrderItem> {
-    const order = await this.orderModel
-      .findOne({ memberId, orderStatus: OrderStatus.FINISH })
-      .exec();
+    productId = shapeIntoMongoObjectId(productId);
 
-    if (!order) throw new ForbiddenException(Message.NO_DATA_FOUND);
+    const orders = await this.orderModel.find({
+      memberId,
+      orderStatus: OrderStatus.FINISH,
+    });
 
-    const orderItem = await this.orderItemModel.findOne({ orderId: order._id, productId }).exec();
+    if (!orders) throw new ForbiddenException(Message.NO_DATA_FOUND);
+
+    const orderItem = await this.orderItemModel.findOne({
+      orderId: { $in: orders.map((o) => o._id) },
+      productId,
+    });
 
     if (!orderItem) throw new ForbiddenException('You did not purchase this product');
 
