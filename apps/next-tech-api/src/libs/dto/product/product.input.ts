@@ -112,6 +112,10 @@ export class ProductsInquiry {
   @Field(() => Direction, { nullable: true })
   direction?: string;
 
+  @IsOptional()
+  @Field(() => Boolean, { nullable: true })
+  onlyMyWishlist?: boolean;
+
   @IsNotEmpty()
   @Field(() => SearchProduct)
   search: SearchProduct;

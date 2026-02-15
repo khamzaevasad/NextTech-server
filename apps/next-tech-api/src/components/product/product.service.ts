@@ -157,31 +157,49 @@ export class ProductService {
 
   /* ------------------------------- getProducts ------------------------------ */
   public async getProducts(memberId: ObjectId, input: ProductsInquiry): Promise<Products> {
-    const match: T = { productStatus: ProductStatus.ACTIVE };
-    const sort: T = { [input?.sort ?? 'createdAt']: input.direction ?? Direction.DESC };
+    const match: T = {
+      productStatus: ProductStatus.ACTIVE,
+    };
+
+    const sort: T = {
+      [input.sort ?? 'createdAt']: input.direction ?? Direction.DESC,
+    };
 
     this.shapeMatchQuery(match, input);
 
-    const result = await this.productModel
-      .aggregate([
-        { $match: match },
-        { $sort: sort },
-        {
-          $facet: {
-            list: [
-              { $skip: (input.page - 1) * input.limit },
-              { $limit: input.limit },
-              lookupAuthMemberLiked(memberId),
-              lookupStoreProduct,
-              { $unwind: '$storeData' },
-            ],
-            metaCounter: [{ $count: 'total' }],
-          },
-        },
-      ])
-      .exec();
+    const pipeline: any[] = [{ $match: match }, { $sort: sort }];
 
-    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    if (input.onlyMyWishlist) {
+      pipeline.push(lookupAuthMemberLiked(memberId), {
+        $match: {
+          'meLiked.0': { $exists: true },
+        },
+      });
+    }
+
+    pipeline.push({
+      $facet: {
+        list: [
+          { $skip: (input.page - 1) * input.limit },
+          { $limit: input.limit },
+
+          ...(input.onlyMyWishlist ? [] : [lookupAuthMemberLiked(memberId)]),
+
+          lookupStoreProduct,
+          { $unwind: '$storeData' },
+        ],
+        metaCounter: [{ $count: 'total' }],
+      },
+    });
+
+    const result = await this.productModel.aggregate(pipeline).exec();
+
+    if (!result || !result.length) {
+      return {
+        list: [],
+        metaCounter: [{ total: 0 }],
+      };
+    }
 
     return result[0];
   }
