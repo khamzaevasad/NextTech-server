@@ -63,6 +63,7 @@ export class StoreService {
     const targetStore = await this.storeModel.findOne(search).exec();
     if (!targetStore) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     const owner = await this.memberService.findMember(targetStore.ownerId);
+
     if (memberId) {
       const viewInput: ViewInput = {
         memberId: memberId,
@@ -83,8 +84,8 @@ export class StoreService {
         likeGroup: LikeGroup.STORE,
       };
       targetStore.meLiked = await this.likeService.checkLikeExistence(likeInput);
-      targetStore.ownerData = owner;
     }
+    targetStore.ownerData = owner;
 
     return targetStore;
   }
