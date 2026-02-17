@@ -64,13 +64,13 @@ export class StoresInquiry {
   limit: number;
 
   @IsOptional()
-  @IsIn([availableStoreSorts])
+  @IsIn(availableStoreSorts)
   @Field(() => String, { nullable: true })
   sort?: string;
 
   @IsOptional()
   @Field(() => Direction, { nullable: true })
-  direction?: string;
+  direction?: Direction;
 
   @IsNotEmpty()
   @Field(() => SearchStore)
