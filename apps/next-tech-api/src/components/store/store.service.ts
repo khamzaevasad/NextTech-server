@@ -16,6 +16,7 @@ import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
 import { LikeService } from '../like/like.service';
 import { OrdinaryInquiry } from '../../libs/dto/product/product.input';
+import { MemberService } from '../member/member.service';
 
 @Injectable()
 export class StoreService {
@@ -23,6 +24,7 @@ export class StoreService {
     @InjectModel('Store') private readonly storeModel: Model<Store>,
     private readonly viewService: ViewService,
     private readonly likeService: LikeService,
+    private readonly memberService: MemberService,
   ) {}
 
   /* ------------------------------- createStore ------------------------------ */
@@ -60,7 +62,7 @@ export class StoreService {
 
     const targetStore = await this.storeModel.findOne(search).exec();
     if (!targetStore) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-
+    const owner = await this.memberService.findMember(targetStore.ownerId);
     if (memberId) {
       const viewInput: ViewInput = {
         memberId: memberId,
@@ -81,6 +83,7 @@ export class StoreService {
         likeGroup: LikeGroup.STORE,
       };
       targetStore.meLiked = await this.likeService.checkLikeExistence(likeInput);
+      targetStore.ownerData = owner;
     }
 
     return targetStore;

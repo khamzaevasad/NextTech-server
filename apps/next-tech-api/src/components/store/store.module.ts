@@ -6,6 +6,7 @@ import StoreSchema from '../../schemas/Store.model';
 import { ViewModule } from '../view/view.module';
 import { AuthModule } from '../auth/auth.module';
 import { LikeModule } from '../like/like.module';
+import { MemberModule } from '../member/member.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { LikeModule } from '../like/like.module';
     AuthModule,
     ViewModule,
     LikeModule,
+    MemberModule,
   ],
   providers: [StoreService, StoreResolver],
   exports: [StoreService],

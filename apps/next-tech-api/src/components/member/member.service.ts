@@ -14,7 +14,7 @@ import { AuthService } from '../auth/auth.service';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { ViewService } from '../view/view.service';
-import { lookupStore } from '../../libs/config';
+import { lookupStore, shapeIntoMongoObjectId } from '../../libs/config';
 import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow';
 
 @Injectable()
@@ -90,6 +90,14 @@ export class MemberService {
     if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     targetMember.meFollowed = memberId ? await this.checkSubscription(memberId, targetId) : [];
     return targetMember;
+  }
+
+  /* ------------------------------- findMember ------------------------------- */
+  public async findMember(_id: string): Promise<Member> {
+    _id = shapeIntoMongoObjectId(_id);
+    const result = await this.memberModel.findById(_id);
+    if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result;
   }
   /* ---------------------------- PRIVATE checkSubscription --------------------------- */
   private async checkSubscription(
