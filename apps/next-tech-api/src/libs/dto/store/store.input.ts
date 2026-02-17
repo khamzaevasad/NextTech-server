@@ -1,5 +1,5 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
+import { IsEnum, IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import type { ObjectId } from 'mongoose';
 import { availableStoreSorts } from '../../config';
 import { Direction } from '../../enums/common.enum';
@@ -17,7 +17,7 @@ export class StoreInput {
   storeName: string;
 
   @IsOptional()
-  @Length(6, 300)
+  @Length(6, 500)
   @Field(() => String, { nullable: true })
   storeDesc?: string;
 
@@ -26,17 +26,17 @@ export class StoreInput {
   storeLogo?: string;
 
   @IsNotEmpty()
-  @Length(3, 12)
+  @Length(3, 15)
   @Field(() => String)
   storePhone: string;
 
   @IsNotEmpty()
-  @Length(3, 12)
+  @Length(3, 100)
   @Field(() => String)
   storeAddress: string;
 
   @IsNotEmpty()
-  @Length(3, 12)
+  @IsEnum(StoreLocation)
   @Field(() => StoreLocation)
   storeLocation: StoreLocation;
 }

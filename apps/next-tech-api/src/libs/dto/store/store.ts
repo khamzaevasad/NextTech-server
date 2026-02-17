@@ -21,8 +21,11 @@ export class Store {
   @Field(() => StoreStatus)
   storeStatus: StoreStatus;
 
+  @Field(() => String)
+  storeAddress: string;
+
   @Field(() => StoreLocation)
-  storeAddress: StoreLocation;
+  storeLocation: StoreLocation;
 
   @Field(() => Int)
   storeProductsCount: number;
