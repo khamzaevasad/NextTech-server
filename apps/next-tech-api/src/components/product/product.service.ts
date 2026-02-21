@@ -291,7 +291,7 @@ export class ProductService {
 
   /* ------------------------- PRIVATE shapeMatchQuery ------------------------ */
   private shapeMatchQuery(match: T, input: ProductsInquiry): void {
-    const { categoryId, storeId, priceRange, specs, text, brands } = input.search;
+    const { categoryId, storeId, priceRange, specs, text, brands, productStatus } = input.search;
 
     if (categoryId) {
       match.productCategory = shapeIntoMongoObjectId(categoryId);
@@ -309,6 +309,10 @@ export class ProductService {
 
     if (text) {
       match.productName = { $regex: new RegExp(text, 'i') };
+    }
+
+    if (productStatus) {
+      match.productStatus = productStatus;
     }
 
     if (specs?.length) {

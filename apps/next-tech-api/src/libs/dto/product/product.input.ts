@@ -89,6 +89,9 @@ export class SearchProduct {
 
   @Field(() => String, { nullable: true })
   text?: string;
+
+  @Field(() => ProductStatus, { nullable: true })
+  productStatus?: ProductStatus;
 }
 
 @InputType()

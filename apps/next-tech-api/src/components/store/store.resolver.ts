@@ -63,6 +63,7 @@ export class StoreResolver {
     return await this.storeService.getStores(memberId, input);
   }
 
+  @Roles(MemberType.SELLER)
   @UseGuards(WithoutGuard)
   @Query(() => Stores)
   /* ------------------------------- getVisited ------------------------------ */
@@ -71,6 +72,13 @@ export class StoreResolver {
     @AuthMember('_id') memberId: ObjectId,
   ): Promise<Stores> {
     return await this.storeService.getVisited(memberId, input);
+  }
+
+  @UseGuards(AuthGuard)
+  @Query(() => Store)
+  /* ------------------------------- getMyStore ------------------------------- */
+  public async getMyStore(@AuthMember('_id') memberId: ObjectId): Promise<Store> {
+    return await this.storeService.getMyStore(memberId);
   }
 
   @UseGuards(AuthGuard)

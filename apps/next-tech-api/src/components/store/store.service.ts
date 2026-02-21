@@ -10,7 +10,7 @@ import { StoreStatus } from '../../libs/enums/store.enum';
 import { ViewService } from '../view/view.service';
 import { ViewInput } from '../../libs/dto/view/view.input';
 import { ViewGroup } from '../../libs/enums/view.enum';
-import { lookupAuthMemberLiked, lookupMember } from '../../libs/config';
+import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config';
 import { StoreUpdate, StoreUpdateAdmin } from '../../libs/dto/store/store.update';
 import { LikeInput } from '../../libs/dto/like/like.input';
 import { LikeGroup } from '../../libs/enums/like.enum';
@@ -118,6 +118,13 @@ export class StoreService {
 
     if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     return result[0];
+  }
+
+  /* ------------------------------- getMyStore ------------------------------- */
+  public async getMyStore(memberId: ObjectId): Promise<Store> {
+    const store = await this.storeModel.findOne({ ownerId: memberId }).exec();
+    if (!store) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return store;
   }
 
   /* ------------------------------- getVisited ------------------------------- */
