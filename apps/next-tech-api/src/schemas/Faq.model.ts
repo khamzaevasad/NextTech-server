@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema } from 'mongoose';
 import { FaqCategory } from '../libs/enums/faq.enum';
 
 const FaqSchema = new Schema(

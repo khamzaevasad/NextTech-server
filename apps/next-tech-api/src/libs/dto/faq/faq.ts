@@ -1,6 +1,5 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import type { ObjectId } from 'mongoose';
-import { NoticeStatus } from '../../enums/notice.enum';
 import { FaqCategory } from '../../enums/faq.enum';
 import { TotalCounter } from '../member/member';
 

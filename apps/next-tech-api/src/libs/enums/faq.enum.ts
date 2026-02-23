@@ -1,3 +1,5 @@
+import { registerEnumType } from '@nestjs/graphql';
+
 export enum FaqCategory {
   GENERAL = 'GENERAL',
   PAYMENT = 'PAYMENT',
@@ -5,3 +7,5 @@ export enum FaqCategory {
   SERVICE = 'SERVICE',
   SELLER = 'SELLER',
 }
+
+registerEnumType(FaqCategory, { name: 'FaqCategory' });
