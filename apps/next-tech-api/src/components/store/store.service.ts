@@ -3,7 +3,7 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Store } from '../../libs/dto/store/store';
-import { StoreInput, StoresInquiry } from '../../libs/dto/store/store.input';
+import { StoreInput, StoresInquiry, StoresInquiryAdmin } from '../../libs/dto/store/store.input';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { StoreStatus } from '../../libs/enums/store.enum';
@@ -196,5 +196,36 @@ export class StoreService {
     if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
     return result;
+  }
+
+  public async getStoresByAdmin(memberId: ObjectId, input: StoresInquiryAdmin): Promise<Stores> {
+    const { text, storeStatus } = input.search;
+    console.log('storeStatus from input:', storeStatus, typeof storeStatus);
+    const match: T = {};
+    const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+    if (text) match.storeName = { $regex: new RegExp(text, 'i') };
+    if (storeStatus) match.storeStatus = storeStatus;
+
+    const result = await this.storeModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupAuthMemberLiked(memberId),
+              lookupMember,
+              { $unwind: '$ownerData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result[0];
   }
 }

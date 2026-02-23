@@ -3,7 +3,7 @@ import { IsEnum, IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validat
 import type { ObjectId } from 'mongoose';
 import { availableStoreSorts } from '../../config';
 import { Direction } from '../../enums/common.enum';
-import { StoreLocation } from '../../enums/store.enum';
+import { StoreLocation, StoreStatus } from '../../enums/store.enum';
 @InputType()
 export class StoreInput {
   // create store
@@ -48,6 +48,10 @@ class SearchStore {
   @IsOptional()
   @Field(() => String, { nullable: true })
   text?: string;
+
+  @IsOptional()
+  @Field(() => StoreStatus, { nullable: true })
+  storeStatus?: StoreStatus;
 }
 
 @InputType()
@@ -75,4 +79,41 @@ export class StoresInquiry {
   @IsNotEmpty()
   @Field(() => SearchStore)
   search: SearchStore;
+}
+
+@InputType()
+class SearchStoreAdmin {
+  @IsOptional()
+  @Field(() => String, { nullable: true })
+  text?: string;
+
+  @IsOptional()
+  @Field(() => StoreStatus, { nullable: true })
+  storeStatus?: StoreStatus;
+}
+
+@InputType()
+export class StoresInquiryAdmin {
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  page: number;
+
+  @IsNotEmpty()
+  @Min(1)
+  @Field(() => Int)
+  limit: number;
+
+  @IsOptional()
+  @IsIn(availableStoreSorts)
+  @Field(() => String, { nullable: true })
+  sort?: string;
+
+  @IsOptional()
+  @Field(() => Direction, { nullable: true })
+  direction?: Direction;
+
+  @IsNotEmpty()
+  @Field(() => SearchStoreAdmin)
+  search: SearchStoreAdmin;
 }

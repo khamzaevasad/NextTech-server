@@ -7,7 +7,7 @@ import { MemberType } from '../../libs/enums/member.enum';
 import { Store, Stores } from '../../libs/dto/store/store';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
-import { StoreInput, StoresInquiry } from '../../libs/dto/store/store.input';
+import { StoreInput, StoresInquiry, StoresInquiryAdmin } from '../../libs/dto/store/store.input';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { StoreUpdate, StoreUpdateAdmin } from '../../libs/dto/store/store.update';
@@ -101,5 +101,16 @@ export class StoreResolver {
   @Mutation(() => Store)
   public async updateStoreByAdmin(@Args('input') input: StoreUpdateAdmin): Promise<Store> {
     return await this.storeService.updateStoreByAdmin(input);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Query(() => Stores)
+  /* -------------------------------- getStores ------------------------------- */
+  public async getStoresByAdmin(
+    @Args('memberId') input: StoresInquiryAdmin,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Stores> {
+    return await this.storeService.getStoresByAdmin(memberId, input);
   }
 }
