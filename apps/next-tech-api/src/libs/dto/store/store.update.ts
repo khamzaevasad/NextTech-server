@@ -15,7 +15,7 @@ export class StoreUpdate {
   storeName?: string;
 
   @IsOptional()
-  @Length(6, 300)
+  @Length(6, 500)
   @Field(() => String, { nullable: true })
   storeDesc?: string;
 
@@ -29,8 +29,8 @@ export class StoreUpdate {
   storeLogo?: string;
 
   @IsOptional()
-  @Field(() => StoreLocation, { nullable: true })
-  storeAddress?: StoreLocation;
+  @Field(() => String, { nullable: true })
+  storeAddress?: string;
 }
 
 /* -------------------------------------------------------------------------- */

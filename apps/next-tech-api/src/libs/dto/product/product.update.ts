@@ -4,7 +4,7 @@ import type { ObjectId } from 'mongoose';
 
 @InputType()
 export class UpdateProductInput extends PartialType(
-  OmitType(CreateProductInput, ['productCategory', 'storeId', 'productSpecs'] as const),
+  OmitType(CreateProductInput, ['productCategory', 'storeId'] as const),
 ) {
   @Field(() => String)
   _id: ObjectId;

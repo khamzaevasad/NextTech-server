@@ -132,7 +132,7 @@ export class ProductService {
     const search: T = {
       _id: input._id,
       storeId: store._id,
-      productStatus: ProductStatus.ACTIVE,
+      // productStatus: ProductStatus.ACTIVE,
     };
 
     const oldProduct = await this.productModel.findOne(search).exec();
@@ -142,13 +142,32 @@ export class ProductService {
 
     if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
 
-    if (input.productStock !== undefined && input.productStock !== oldProduct.productStock) {
-      const stockDifference = input.productStock - oldProduct.productStock;
+    const oldStatus = oldProduct.productStatus;
+    const newStatus = input.productStatus ?? oldProduct.productStatus;
 
+    let stockModifier = 0;
+
+    if (
+      oldStatus === ProductStatus.ACTIVE &&
+      newStatus === ProductStatus.ACTIVE &&
+      input.productStock !== undefined
+    ) {
+      stockModifier = input.productStock - oldProduct.productStock;
+    }
+
+    if (oldStatus !== ProductStatus.ACTIVE && newStatus === ProductStatus.ACTIVE) {
+      stockModifier = input.productStock ?? oldProduct.productStock;
+    }
+
+    if (oldStatus === ProductStatus.ACTIVE && newStatus !== ProductStatus.ACTIVE) {
+      stockModifier = -oldProduct.productStock;
+    }
+
+    if (stockModifier !== 0) {
       await this.storeService.storeStatsEditor({
         _id: result.storeId,
         targetKey: 'storeProductsCount',
-        modifier: stockDifference,
+        modifier: stockModifier,
       });
     }
 
