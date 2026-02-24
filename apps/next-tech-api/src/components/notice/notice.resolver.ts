@@ -40,10 +40,15 @@ export class NoticeResolver {
   @UseGuards(WithoutGuard)
   @Query(() => Notices)
   /* -------------------------------- getNotice ------------------------------- */
-  public async getNotices(
-    @Args('input') input: NoticeInquiry,
-    @AuthMember('_id') memberId: ObjectId,
-  ): Promise<Notices> {
+  public async getNotices(@Args('input') input: NoticeInquiry): Promise<Notices> {
     return await this.noticeService.getNotices(input);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Query(() => Notices)
+  /* -------------------------------- getNotice ------------------------------- */
+  public async getNoticesByAdmin(@Args('input') input: NoticeInquiry): Promise<Notices> {
+    return await this.noticeService.getNoticesByAdmin(input);
   }
 }

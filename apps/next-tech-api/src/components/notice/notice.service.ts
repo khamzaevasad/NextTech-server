@@ -88,4 +88,32 @@ export class NoticeService {
     if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     return result[0];
   }
+
+  /* ---------------------------- getNoticesByAdmin --------------------------- */
+  public async getNoticesByAdmin(input: NoticeInquiry): Promise<Notices> {
+    const { text } = input.search;
+    const match: T = {};
+    const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+    if (text) match.articleTitle = { $regex: new RegExp(text, 'i') };
+
+    const result = await this.noticeModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupNoticeMember,
+              { $unwind: '$authorData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result[0];
+  }
 }
