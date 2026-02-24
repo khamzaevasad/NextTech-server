@@ -10,6 +10,7 @@ import type { ObjectId } from 'mongoose';
 import { NoticeInput, NoticeInquiry } from '../../libs/dto/notice/notice.input';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
+import { UpdateNotice } from '../../libs/dto/notice/notice.update';
 
 @Resolver()
 export class NoticeResolver {
@@ -50,5 +51,16 @@ export class NoticeResolver {
   /* -------------------------------- getNotice ------------------------------- */
   public async getNoticesByAdmin(@Args('input') input: NoticeInquiry): Promise<Notices> {
     return await this.noticeService.getNoticesByAdmin(input);
+  }
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Mutation(() => Notice)
+  /* -------------------------------- updateNotice ------------------------------- */
+  public async updateNotice(
+    @Args('input') input: UpdateNotice,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Notice> {
+    input._id = shapeIntoMongoObjectId(input._id);
+    return await this.noticeService.updateNotice(memberId, input);
   }
 }

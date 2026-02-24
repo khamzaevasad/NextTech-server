@@ -9,6 +9,7 @@ import { NoticeStatus } from '../../libs/enums/notice.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
 import { lookupNoticeMember } from '../../libs/config';
+import { UpdateNotice } from '../../libs/dto/notice/notice.update';
 
 @Injectable()
 export class NoticeService {
@@ -116,5 +117,22 @@ export class NoticeService {
       .exec();
     if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
     return result[0];
+  }
+
+  /* ------------------------------ updateNotice ------------------------------ */
+  public async updateNotice(memberId: ObjectId, input: UpdateNotice): Promise<Notice> {
+    const result = await this.noticeModel
+      .findOneAndUpdate(
+        {
+          _id: input._id,
+          memberId: memberId,
+        },
+        input,
+        { new: true },
+      )
+      .exec();
+
+    if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+    return result;
   }
 }

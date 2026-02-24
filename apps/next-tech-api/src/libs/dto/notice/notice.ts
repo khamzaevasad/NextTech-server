@@ -30,8 +30,8 @@ export class Notice {
   updatedAt: Date;
 
   /* ---------------------------- from aggregation ---------------------------- */
-  @Field(() => Member)
-  authorData: Member;
+  @Field(() => Member, { nullable: true })
+  authorData?: Member;
 }
 
 @ObjectType()
