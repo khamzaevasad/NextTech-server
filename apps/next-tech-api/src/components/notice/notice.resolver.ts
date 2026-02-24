@@ -40,7 +40,7 @@ export class NoticeResolver {
 
   @UseGuards(WithoutGuard)
   @Query(() => Notices)
-  /* -------------------------------- getNotice ------------------------------- */
+  /* -------------------------------- getNotices ------------------------------- */
   public async getNotices(@Args('input') input: NoticeInquiry): Promise<Notices> {
     return await this.noticeService.getNotices(input);
   }
@@ -48,7 +48,7 @@ export class NoticeResolver {
   @UseGuards(RolesGuard)
   @Roles(MemberType.ADMIN)
   @Query(() => Notices)
-  /* -------------------------------- getNotice ------------------------------- */
+  /* -------------------------------- getNoticesByAdmin ------------------------------- */
   public async getNoticesByAdmin(@Args('input') input: NoticeInquiry): Promise<Notices> {
     return await this.noticeService.getNoticesByAdmin(input);
   }

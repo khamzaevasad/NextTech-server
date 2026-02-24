@@ -8,7 +8,7 @@ import { StatisticModifier, T } from '../../libs/types/common';
 import { NoticeStatus } from '../../libs/enums/notice.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
-import { lookupNoticeMember } from '../../libs/config';
+import { lookupCsMember } from '../../libs/config';
 import { UpdateNotice } from '../../libs/dto/notice/notice.update';
 
 @Injectable()
@@ -78,7 +78,7 @@ export class NoticeService {
             list: [
               { $skip: (input.page - 1) * input.limit },
               { $limit: input.limit },
-              lookupNoticeMember,
+              lookupCsMember,
               { $unwind: '$authorData' },
             ],
             metaCounter: [{ $count: 'total' }],
@@ -107,7 +107,7 @@ export class NoticeService {
             list: [
               { $skip: (input.page - 1) * input.limit },
               { $limit: input.limit },
-              lookupNoticeMember,
+              lookupCsMember,
               { $unwind: '$authorData' },
             ],
             metaCounter: [{ $count: 'total' }],

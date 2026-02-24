@@ -5,9 +5,9 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { MemberType } from '../../libs/enums/member.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
-import { FaqInput } from '../../libs/dto/faq/faq.input';
+import { FaqInput, FaqInquiry } from '../../libs/dto/faq/faq.input';
 import type { ObjectId } from 'mongoose';
-import { Faq } from '../../libs/dto/faq/faq';
+import { Faq, Faqs } from '../../libs/dto/faq/faq';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 
@@ -35,5 +35,12 @@ export class FaqResolver {
   ): Promise<Faq> {
     const faqId = shapeIntoMongoObjectId(input);
     return await this.faqService.getFaq(faqId);
+  }
+
+  @UseGuards(WithoutGuard)
+  @Query(() => Faqs)
+  /* -------------------------------- getFaqs ------------------------------- */
+  public async getFaqs(@Args('input') input: FaqInquiry): Promise<Faqs> {
+    return await this.faqService.getFaqs(input);
   }
 }

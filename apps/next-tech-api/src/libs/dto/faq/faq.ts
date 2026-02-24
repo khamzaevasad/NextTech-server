@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import type { ObjectId } from 'mongoose';
 import { FaqCategory } from '../../enums/faq.enum';
-import { TotalCounter } from '../member/member';
+import { Member, TotalCounter } from '../member/member';
 
 @ObjectType()
 export class Faq {
@@ -33,6 +33,9 @@ export class Faq {
   updatedAt: Date;
 
   /* ---------------------------- from aggregation ---------------------------- */
+
+  @Field(() => Member, { nullable: true })
+  authorData?: Member;
 }
 
 @ObjectType()

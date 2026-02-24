@@ -53,7 +53,7 @@ export const lookupMember = {
     as: 'ownerData',
   },
 };
-export const lookupNoticeMember = {
+export const lookupCsMember = {
   $lookup: {
     from: 'members',
     localField: 'memberId',
