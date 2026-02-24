@@ -79,7 +79,6 @@ export class FaqService {
       .findOneAndUpdate(
         {
           _id: input._id,
-          memberId: memberId,
         },
         input,
         { new: true },
@@ -87,6 +86,54 @@ export class FaqService {
       .exec();
 
     if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
+    return result;
+  }
+
+  /* ----------------------------- getFaqsByAdmin ----------------------------- */
+  public async getFaqsByAdmin(input: FaqInquiry): Promise<Faqs> {
+    const { text, faqCategory } = input.search;
+
+    const match: T = {};
+
+    if (text) {
+      match.question = { $regex: new RegExp(text, 'i') };
+    }
+
+    if (faqCategory) {
+      match.category = faqCategory;
+    }
+
+    const result = await this.faqModel.aggregate([
+      { $match: match },
+
+      { $sort: { order: 1, createdAt: -1 } },
+
+      {
+        $facet: {
+          list: [
+            { $skip: (input.page - 1) * input.limit },
+            { $limit: input.limit },
+            lookupCsMember,
+            { $unwind: '$authorData' },
+          ],
+          metaCounter: [{ $count: 'total' }],
+        },
+      },
+    ]);
+
+    if (!result.length) {
+      return { list: [], metaCounter: [{ total: 0 }] };
+    }
+
+    return result[0];
+  }
+
+  /* ---------------------------- removeFaqByAdmin ---------------------------- */
+  public async removeFaqByAdmin(faqId: ObjectId): Promise<Faq> {
+    const search: T = { _id: faqId, isActive: false };
+    const result = await this.faqModel.findOneAndDelete(search).exec();
+    if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+
     return result;
   }
 }

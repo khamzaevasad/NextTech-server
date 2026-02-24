@@ -135,4 +135,13 @@ export class NoticeService {
     if (!result) throw new InternalServerErrorException(Message.UPDATE_FAILED);
     return result;
   }
+
+  /* --------------------------- removeNoticeByAdmin -------------------------- */
+  public async removeNoticeByAdmin(noticeId: ObjectId): Promise<Notice> {
+    const search: T = { _id: noticeId, noticeStatus: NoticeStatus.DELETE };
+    const result = await this.noticeModel.findOneAndDelete(search).exec();
+    if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+
+    return result;
+  }
 }

@@ -63,4 +63,13 @@ export class NoticeResolver {
     input._id = shapeIntoMongoObjectId(input._id);
     return await this.noticeService.updateNotice(memberId, input);
   }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Mutation(() => Notice)
+  /* -------------------------------- removeNoticeByAdmin ------------------------------- */
+  public async removeNoticeByAdmin(@Args('input') input: string): Promise<Notice> {
+    const noticeId = shapeIntoMongoObjectId(input);
+    return await this.noticeService.removeNoticeByAdmin(noticeId);
+  }
 }

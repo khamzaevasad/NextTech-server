@@ -13,6 +13,7 @@ export enum NoticeStatus {
   HOLD = 'HOLD',
   ACTIVE = 'ACTIVE',
   DELETE = 'DELETE',
+  EVENT = 'EVENT',
 }
 registerEnumType(NoticeStatus, {
   name: 'NoticeStatus',

@@ -1,5 +1,5 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
-import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
+import { IsBoolean, IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import { FaqCategory } from '../../enums/faq.enum';
 import { ObjectId } from 'mongoose';
 import { sorts } from '../../config';
@@ -20,6 +20,17 @@ export class FaqInput {
   @IsOptional()
   @Field(() => FaqCategory, { nullable: true })
   category?: FaqCategory;
+
+  // @Field(() => Boolean, { nullable: true })
+  // isActive?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  order?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  @Field(() => Boolean, { nullable: true })
+  isActive?: boolean;
 
   memberId?: ObjectId;
 }

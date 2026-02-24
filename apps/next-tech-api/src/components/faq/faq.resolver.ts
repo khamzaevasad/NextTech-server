@@ -11,6 +11,7 @@ import { Faq, Faqs } from '../../libs/dto/faq/faq';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { UpdateFaq } from '../../libs/dto/faq/faq.update';
+import { T } from '../../libs/types/common';
 
 @Resolver()
 export class FaqResolver {
@@ -45,6 +46,13 @@ export class FaqResolver {
     return await this.faqService.getFaqs(input);
   }
 
+  @UseGuards(WithoutGuard)
+  @Query(() => Faqs)
+  /* -------------------------------- getFaqsByAdmin ------------------------------- */
+  public async getFaqsByAdmin(@Args('input') input: FaqInquiry): Promise<Faqs> {
+    return await this.faqService.getFaqsByAdmin(input);
+  }
+
   @UseGuards(RolesGuard)
   @Roles(MemberType.ADMIN)
   @Mutation(() => Faq)
@@ -55,5 +63,14 @@ export class FaqResolver {
   ): Promise<Faq> {
     input._id = shapeIntoMongoObjectId(input._id);
     return await this.faqService.updateFaq(memberId, input);
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(MemberType.ADMIN)
+  @Mutation(() => Faq)
+  /* -------------------------------- updateNotice ------------------------------- */
+  public async removeFaqByAdmin(@Args('input') input: string): Promise<Faq> {
+    const faqId = shapeIntoMongoObjectId(input);
+    return await this.faqService.removeFaqByAdmin(faqId);
   }
 }
