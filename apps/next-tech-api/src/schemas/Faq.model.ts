@@ -24,6 +24,12 @@ const FaqSchema = new Schema(
       default: 0,
     },
 
+    memberId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Member',
+    },
+
     isActive: {
       type: Boolean,
       default: true,
