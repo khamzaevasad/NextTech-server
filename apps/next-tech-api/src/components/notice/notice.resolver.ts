@@ -4,10 +4,10 @@ import { UseGuards } from '@nestjs/common';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { MemberType } from '../../libs/enums/member.enum';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { Notice } from '../../libs/dto/notice/notice';
+import { Notice, Notices } from '../../libs/dto/notice/notice';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
 import type { ObjectId } from 'mongoose';
-import { NoticeInput } from '../../libs/dto/notice/notice.input';
+import { NoticeInput, NoticeInquiry } from '../../libs/dto/notice/notice.input';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { WithoutGuard } from '../auth/guards/without.guard';
 
@@ -35,5 +35,15 @@ export class NoticeResolver {
   ): Promise<Notice> {
     const noticeId = shapeIntoMongoObjectId(input);
     return await this.noticeService.getNotice(memberId, noticeId);
+  }
+
+  @UseGuards(WithoutGuard)
+  @Query(() => Notices)
+  /* -------------------------------- getNotice ------------------------------- */
+  public async getNotices(
+    @Args('input') input: NoticeInquiry,
+    @AuthMember('_id') memberId: ObjectId,
+  ): Promise<Notices> {
+    return await this.noticeService.getNotices(input);
   }
 }

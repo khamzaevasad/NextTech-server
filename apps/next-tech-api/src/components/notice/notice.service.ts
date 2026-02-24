@@ -1,13 +1,14 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Notice } from '../../libs/dto/notice/notice';
+import { Notice, Notices } from '../../libs/dto/notice/notice';
 import { Model, ObjectId } from 'mongoose';
-import { Message } from '../../libs/enums/common.enum';
-import { NoticeInput } from '../../libs/dto/notice/notice.input';
+import { Direction, Message } from '../../libs/enums/common.enum';
+import { NoticeInput, NoticeInquiry } from '../../libs/dto/notice/notice.input';
 import { StatisticModifier, T } from '../../libs/types/common';
 import { NoticeStatus } from '../../libs/enums/notice.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
 import { ViewService } from '../view/view.service';
+import { lookupNoticeMember } from '../../libs/config';
 
 @Injectable()
 export class NoticeService {
@@ -58,5 +59,33 @@ export class NoticeService {
     return await this.noticeModel
       .findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true })
       .exec();
+  }
+
+  /* ------------------------------- getNotices ------------------------------- */
+  public async getNotices(input: NoticeInquiry): Promise<Notices> {
+    const { text } = input.search;
+    const match: T = { noticeStatus: NoticeStatus.ACTIVE };
+    const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+    if (text) match.articleTitle = { $regex: new RegExp(text, 'i') };
+
+    const result = await this.noticeModel
+      .aggregate([
+        { $match: match },
+        { $sort: sort },
+        {
+          $facet: {
+            list: [
+              { $skip: (input.page - 1) * input.limit },
+              { $limit: input.limit },
+              lookupNoticeMember,
+              { $unwind: '$authorData' },
+            ],
+            metaCounter: [{ $count: 'total' }],
+          },
+        },
+      ])
+      .exec();
+    if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+    return result[0];
   }
 }
