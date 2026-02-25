@@ -205,6 +205,7 @@ export class ProductService {
     return result[0];
   }
 
+  /* ------------------------------- findProduct ------------------------------ */
   public async findProduct(productId: ObjectId): Promise<Product> {
     const result: Product | null = await this.productModel.findById({ _id: productId }).exec();
 
@@ -377,8 +378,6 @@ export class ProductService {
 
     return slug;
   }
-
-  /* -------------------------- PRIVATE validateProductReview ------------------------- */
 
   /* -------------------------------------------------------------------------- */
   /*                                  FOR ADMIN                                 */

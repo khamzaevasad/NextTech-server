@@ -161,7 +161,7 @@ export class OrderService {
 
   /* ------------------------------- getMyOrders ------------------------------ */
   public async getMyOrders(memberId: ObjectId, input: OrdersInquiry): Promise<Orders> {
-    const match: T = {};
+    const match: T = { memberId: memberId };
     const sort: T = { [input?.sort ?? 'createdAt']: input.direction ?? Direction.DESC };
     if (input.search.orderStatus) match.orderStatus = input.search.orderStatus;
     const result = await this.orderModel

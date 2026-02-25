@@ -169,17 +169,22 @@ export class CommentService {
       orderStatus: OrderStatus.FINISH,
     });
 
-    if (!orders) throw new ForbiddenException(Message.NO_DATA_FOUND);
+    if (!orders.length) {
+      throw new ForbiddenException('You did not purchase this product');
+    }
 
     const orderItem = await this.orderItemModel.findOne({
       orderId: { $in: orders.map((o) => o._id) },
       productId,
     });
 
-    if (!orderItem) throw new ForbiddenException('You did not purchase this product');
-
+    if (!orderItem) {
+      throw new ForbiddenException('You did not purchase this product');
+    }
     // @ts-ignore
-    if (orderItem.isReviewed) throw new BadRequestException('Product already reviewed');
+    if (orderItem.isReviewed) {
+      throw new BadRequestException('Product already reviewed');
+    }
 
     return orderItem;
   }
