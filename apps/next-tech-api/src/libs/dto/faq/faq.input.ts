@@ -8,12 +8,12 @@ import { Direction } from '../../enums/common.enum';
 @InputType()
 export class FaqInput {
   @IsNotEmpty()
-  @Length(2, 200)
+  @Length(2, 600)
   @Field(() => String)
   question: string;
 
   @IsNotEmpty()
-  @Length(2, 200)
+  @Length(2, 600)
   @Field(() => String)
   answer: string;
 

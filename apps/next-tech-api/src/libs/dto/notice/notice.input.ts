@@ -8,13 +8,13 @@ import { Direction } from '../../enums/common.enum';
 @InputType()
 export class NoticeInput {
   @IsNotEmpty()
-  @Length(2, 20)
   @Field(() => String)
+  @Length(2, 600)
   noticeTitle: string;
 
   @IsNotEmpty()
-  @Length(2, 200)
   @Field(() => String)
+  @Length(2, 600)
   noticeContent: string;
 
   @IsOptional()
