@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Member } from 'apps/next-tech-api/src/libs/dto/member/member';
+import { Product } from 'apps/next-tech-api/src/libs/dto/product/product';
 import { Store } from 'apps/next-tech-api/src/libs/dto/store/store';
 import { MemberStatus, MemberType } from 'apps/next-tech-api/src/libs/enums/member.enum';
 import { StoreStatus } from 'apps/next-tech-api/src/libs/enums/store.enum';
@@ -44,6 +45,7 @@ export class BatchService {
     });
     await Promise.all(promisedList);
   }
+
   /* ----------------------------- batchTopStores ----------------------------- */
   public async batchTopStores() {
     const stores: Store[] = await this.storeModel
@@ -54,9 +56,11 @@ export class BatchService {
       .exec();
 
     const promisedList = stores.map(async (store: Store) => {
-      const { _id, storeLikes, storeViews } = store;
-      const rating = storeLikes * 2 + storeViews * 1;
-      return await this.storeModel.findByIdAndUpdate(_id, { storeRating: rating });
+      if (store.storeProductsCount > 3) {
+        const { _id, storeLikes, storeViews } = store;
+        const rating = storeLikes * 2 + storeViews * 1;
+        return await this.storeModel.findByIdAndUpdate(_id, { storeRating: rating });
+      }
     });
     await Promise.all(promisedList);
   }
