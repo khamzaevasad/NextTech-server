@@ -78,6 +78,10 @@ export class SearchProduct {
   @Field(() => String, { nullable: true })
   categoryId?: ObjectId;
 
+  @IsOptional()
+  @Field(() => [String], { nullable: true })
+  categoryIds?: ObjectId[];
+
   @Field(() => PriceRange, { nullable: true })
   priceRange?: PriceRange;
 

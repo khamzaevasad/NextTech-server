@@ -311,11 +311,17 @@ export class ProductService {
 
   /* ------------------------- PRIVATE shapeMatchQuery ------------------------ */
   private shapeMatchQuery(match: T, input: ProductsInquiry): void {
-    const { categoryId, storeId, priceRange, specs, text, brands, productStatus } = input.search;
+    const { categoryId, storeId, priceRange, specs, text, brands, productStatus, categoryIds } =
+      input.search;
 
-    if (categoryId) {
+    if (categoryIds && categoryIds.length > 0) {
+      match.productCategory = {
+        $in: categoryIds.map((id) => shapeIntoMongoObjectId(id)),
+      };
+    } else if (categoryId) {
       match.productCategory = shapeIntoMongoObjectId(categoryId);
     }
+
     if (storeId) {
       match.storeId = shapeIntoMongoObjectId(storeId);
     }
