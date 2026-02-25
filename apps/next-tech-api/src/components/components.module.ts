@@ -12,6 +12,7 @@ import { CategoryModule } from './category/category.module';
 import { CommentModule } from './comment/comment.module';
 import { NoticeModule } from './notice/notice.module';
 import { FaqModule } from './faq/faq.module';
+import { TelegramModule } from './telegram/telegram.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { FaqModule } from './faq/faq.module';
     CommentModule,
     NoticeModule,
     FaqModule,
+    TelegramModule,
   ],
 })
 export class ComponentsModule {}
