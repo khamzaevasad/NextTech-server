@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+  next-tech-api:
+    container_name: next-tech
+    restart: always
+    image: node:20.10.0
+    ports:
+      - 4001:3007
+    volumes:
+      - .:/usr/src/next-tech
+    working_dir: /usr/src/next-tech
+
+    networks:
+      - monorepo-network
+    # FOR PRODUCTION
+    command: bash -c "npm install && npm run build && npm run start:prod"
+
+  next-tech-batch:
+    container_name: next-tech-batch
+    restart: unless-stopped
+    image: node:20.10.0
+    ports:
+      - 4002:3008
+    volumes:
+      - .:/usr/src/next-tech
+    working_dir: /usr/src/next-tech
+
+    networks:
+      - monorepo-network
+    # FOR PRODUCTION
+    command: bash -c "npm install && npm run build && npm run start:prod:batch"
+
+networks:
+  monorepo-network:
+    driver: bridge
