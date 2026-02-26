@@ -14,7 +14,7 @@ export class BatchController {
   }
 
   /* ------------------------------ batchRollback ----------------------------- */
-  @Cron('00 00 01 * * *', { name: BATCH_ROLLBACK })
+  @Cron('00 00 0 * * *', { name: BATCH_ROLLBACK })
   public async batchRollback() {
     try {
       this.logger['context'] = BATCH_ROLLBACK;
