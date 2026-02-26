@@ -2,7 +2,7 @@
 
 #PRODUCTION
 git reset--hard
-git checkout main
+git checkout master
 git pull origin master
 
 docker compose up -d
