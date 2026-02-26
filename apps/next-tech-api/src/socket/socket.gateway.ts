@@ -3,7 +3,10 @@ import { OnGatewayInit, SubscribeMessage, WebSocketGateway } from '@nestjs/webso
 import { Server } from 'ws';
 import { TelegramService } from '../components/telegram/telegram.service';
 
-@WebSocketGateway(3001, { transports: ['websocket'], secure: false })
+@WebSocketGateway(parseInt(process.env.WS_PORT || '3001'), {
+  transports: ['websocket'],
+  secure: false,
+})
 export class SocketGateway implements OnGatewayInit {
   private logger: Logger = new Logger('SocketEventsGateway');
   private summaryClient: number = 0;

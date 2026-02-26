@@ -13,7 +13,7 @@
     "start:dev:batch": "nest start next-tech-batch --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "NODE_ENV=production node dist/apps/next-tech-api/main",
-    "start:prod:batch": "node dist/apps/next-tech-batch/main",
+    "start:prod:batch": "NODE_ENV=production node dist/apps/next-tech-batch/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
