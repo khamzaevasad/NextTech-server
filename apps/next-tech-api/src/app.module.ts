@@ -21,6 +21,7 @@ import { SocketModule } from './socket/socket.module';
       playground: true,
       uploads: false,
       autoSchemaFile: true,
+      introspection: true,
       formatError: (error: T) => {
         const graphQLFromattedError = {
           code: error.extensions.code,
