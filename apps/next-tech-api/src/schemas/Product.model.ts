@@ -83,6 +83,4 @@ const ProductSchema = new Schema(
 ProductSchema.index({ productCategory: 1 });
 ProductSchema.index({ productName: 1 });
 ProductSchema.index({ productBrand: 1 });
-ProductSchema.index({ productSlug: 1 });
-
 export default ProductSchema;

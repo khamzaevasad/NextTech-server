@@ -53,6 +53,5 @@ CategorySchema.virtual('children', {
 });
 
 CategorySchema.index({ parentId: 1 });
-CategorySchema.index({ categorySlug: 1 });
 
 export default CategorySchema;
